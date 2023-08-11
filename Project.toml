@@ -1,0 +1,14 @@
+name = "PrefectInterfaces"
+uuid = "25d49962-0f22-42a0-bb44-b427e1ded1d4"
+authors = ["mahiki <mahiki@users.noreply.github.com>"]
+version = "0.2.0"
+
+[deps]
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+ConfigEnv = "01234589-554d-41b7-ae5c-7b6ee2db6796"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
+HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
+JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
+Match = "7eb4fadd-790c-5f42-8a69-bfa0b872bfbf"
+Parameters = "d96e819e-fc66-5662-9728-84c9c7592b0a"

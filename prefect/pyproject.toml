@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "pi-test"
+version = "0.1.0"
+description = "A small demonstration prefect installation for testing julia functions in the PrefectInterfaces module."
+authors = ["mahiki"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+python-dotenv = "^1.0.0"
+prefect = "^2.10"
+ptpython = "^3.0.23"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

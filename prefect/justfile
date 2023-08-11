@@ -1,0 +1,117 @@
+# Justfile Prefect Notes
+#   usage:
+#     just                  # lists available recipes
+#     just <recipe name>    # run the named recipe
+#   PREFECT_HOME determines location of Prefect DB location for local environments.
+#   PREFECT_API_URL is managed in profiles.toml, and it determines which DB is 
+#     being connected in calls to prefect.
+
+# not generally needed
+set dotenv-load := true
+
+# the prefect cli needs a profiles.toml to define API URL and other configs
+export PREFECT_PROFILES_PATH := "./profiles.toml"
+
+# [ main | dev ] environments for test and deployment
+supported_envs := "main dev"
+branch := `git symbolic-ref --short HEAD`
+use_branch := if (branch) == "main" { "main" } else { "dev" }
+
+home_dir := env_var('HOME')
+prefect_home_dev := "./prefecthome/prefect_dev"
+prefect_home_main := "./prefecthome/prefect_main"
+dashboard_url := `echo "${PREFECT_API_URL}" | sed 's|/api||g'`
+
+# Poetry Prefect justfile commands list
+default:
+  @just --list --unsorted
+
+# pass thru command
+run *args:
+  {{args}}
+
+# prefect commands in poetry environment, i.e. 'just pre blocks ls'
+pre *args:
+  poetry run prefect {{args}}
+
+# switch prefect profile [main | dev] to current or specified branch
+use *branch=use_branch:
+  -poetry run prefect profile use {{branch}}
+
+# dump justfile exported variables and prefect config variables to screen
+env:
+  @echo "            environment variables:"
+  @env | grep "PREFECT_" | sort
+  @echo "current just process branch:     {{branch}}"
+  @echo "current just process use_branch: {{use_branch}}"
+  @echo "            prefect config:"
+  @poetry run prefect config view
+
+# list profiles, blocks, deployments
+ls:
+  poetry run prefect block ls
+  poetry run prefect deployment ls
+
+# launch service: start a local Prefect Server and Prefect Agent in detached tmux sessions
+launch: && mux
+  #!/usr/bin/env bash
+  enviro="main"
+  echo "✙✙ launch service environment: ${enviro} ✙✙"
+  tmux new-session -d -s "pi-${enviro}" -n "server-${enviro}"
+  tmux setenv -t "pi-${enviro}" PREFECT_HOME {{prefect_home_main}}
+  tmux send-keys -t "server-${enviro}.0" "export PREFECT_HOME={{prefect_home_main}}"  ENTER
+  sleep 0.5
+  tmux send-keys -t "server-${enviro}.0" 'poetry run prefect server start' ENTER
+
+# kill Prefect service: close the sessions with Prefect Server and Agent
+kill:
+  -tmux kill-session -t pi-main
+
+# list active tmux sessions
+mux: 
+  -@tmux ls
+
+# view service: [main | dev] tmux session with Prefect Server and Agent
+view env='main':
+  @echo "Attaching tmux session, to detach from TMUX: Ctrl-b, d"
+  @sleep 2
+  @tmux attach-session -t pi-{{env}} || echo "Prefect DB tmux session not started, try 'just launch'"
+
+# enter pypython REPL with justfile env vars loaded
+repl:
+  poetry run ptpython
+
+# register all blocks for bootstrap setup, including secrets, slack, etc
+registerall: && ls
+  PREFECT_ENV={{use_branch}} poetry run prefect block register --file src/blocks/str_prefect_env.py
+  poetry run prefect block register --file src/blocks/fs_willowdata.py
+
+
+
+########   INSTALLATION   ########
+##################################
+
+# initialise and configure a running local prefect server
+init: && (use "main") launch _sleep registerall
+  @echo "         ++ Initializing Prefect Server ++"
+  @echo
+  @echo "Prerequisites:"
+  @echo "   pipx (to install poetry), python3, tmux, git, poetry"
+  @echo
+  @echo "This script will:"
+  @echo "   1. Install poetry environment (prefect and pyproject.toml deps)"
+  @echo "   2. Set environment (currently only configured for 'main')"
+  @echo "   3. Launch the prefect server in a detached tmux session, db file at {{prefect_home_dev}}"
+  @echo "   4. Register blocks to define local datastore location"
+  @echo
+  @echo "When prefect server is running the dashboard can be viewed at:"
+  @echo "   {{dashboard_url}}"
+  @echo "   or the PREFECT_API_URL defined in env or profiles.toml"
+  @echo
+  @read -p "CTRL-C TO EXIT ELSE CONTINUE INSTALL:" -n 1 -r
+  @echo
+  poetry env use 3.11
+  poetry install
+
+_sleep:
+  sleep 5

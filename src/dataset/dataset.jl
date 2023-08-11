@@ -1,0 +1,131 @@
+using Dates, CSV, DataFrames
+using Parameters
+
+"""
+    Dataset(dataset_name=str::String; kwargs...)
+
+An object that stores configuration, and file path locations. Assertions constrain valid field values. If `rundate` is not the current date, the `latest_path` will not be used.
+
+*NOTE:* No positional arguments allowed b/c of @kw_def, keyworded args only.
+
+Supported keyword arguments (default show first):
+
+    dataset_name::String (required)
+    datastore_type ∈ ["local", "remote"]
+    dataset_type ∈ ["extracts", "reports", "images"]
+    file_format ∈ ["csv"]
+    rundate::Date = Datest.today()
+    rundate_type ∈ ["latest", "specific"]
+    
+# Examples
+```jldoctest
+julia> begin
+    ENV["PREFECT_LOCAL_DATA_BLOCK"] = "local-file-system/willowdata"
+    ENV["PREFECT_API_URL"] = "http://127.0.0.1:4209/api"
+end;
+
+julia> ds = Dataset(dataset_name="test_table", datastore_type="local")
+Dataset
+  dataset_name: String "test_table"
+  datastore_type: String "local"
+  dataset_type: String "extracts"
+  file_format: String "csv"
+  rundate: Dates.Date
+  rundate_type: String "latest"
+  dataset_path: String "extracts/csv/dataset=test_table/rundate=2023-07-24/data.csv"
+  latest_path: String "extracts/csv/latest/dataset=test_table/data.csv"
+  image_path: String "extracts/dataset=test_table/rundate=2023-07-24"
+
+julia> df = read(ds)
+1×2 DataFrame
+ Row │ column1                            result
+     │ String                             String7
+─────┼────────────────────────────────────────────
+   1 │ If you can select this table you…  PASSED
+```
+"""
+@with_kw struct Dataset <: AbstractPrefectInterface
+    dataset_name::String
+    datastore_type::String = begin
+        @warn "datastore_type = remote not supported yet"
+        "remote"
+    end
+    dataset_type::String = "extracts"
+    file_format::String = "csv"
+    rundate::Date = Dates.today()
+    rundate_type::String = "latest"
+    dataset_path::String = "$dataset_type/$file_format/dataset=$dataset_name/rundate=$rundate/data.csv"
+    latest_path::String = "$dataset_type/$file_format/latest/dataset=$dataset_name/data.csv"
+    image_path::String = begin
+        @warn "image paths not supported yet"
+        "$dataset_type/dataset=$dataset_name/rundate=$rundate"
+    end
+    @assert dataset_type ∈ ["extracts", "reports", "images"]
+    @assert datastore_type ∈ ["local", "remote"]
+    @assert rundate_type ∈ ["latest", "specific"]
+    @assert file_format ∈ ["csv"]
+    # TODO: image path and filename doesnt quite make sense as seperate field. also, this is ugly looking.
+end
+
+
+"""
+    read(ds::Dataset)
+
+Returns a `DataFrame` by calling `CSV.read` on a filepath defined by the Dataset type.
+*NOTE:* A prefect server must be available.
+
+# Examples
+```jldoctest
+julia> begin
+    ENV["PREFECT_API_URL"] = "http://127.0.0.1:4209/api"
+    ENV["PREFECT_LOCAL_DATA_BLOCK"] = "local-file-system/willowdata"
+end;
+
+julia> df = read(Dataset(dataset_name="test_table", datastore_type="local"))
+1×2 DataFrame
+ Row │ column1                            result
+     │ String                             String7
+─────┼────────────────────────────────────────────
+   1 │ If you can select this table you…  PASSED
+```
+"""
+function read(ds::Dataset)
+    @warn "remote datastore read/write not supported yet"
+    prefect_block = block_selector(ds)
+    path_key = rundate_path_selector(ds)
+    prefect_block.block.read_path(path_key)
+end
+
+"""
+    write(ds::Dataset, df::DataFrame)
+
+Writes a `DataFrame` via `CSV.write` to a filepath defined by the `Dataset` type.
+"""
+function write(ds::Dataset, df::AbstractDataFrame)
+    @warn "remote datastore read/write not supported yet"
+    prefect_block = block_selector(ds)
+    path_key = rundate_path_selector(ds)
+    prefect_block.block.write_path(path_key, df)
+end
+
+
+"""
+    block_selector(ds::Dataset)
+
+Returns the PrefectBlock corresponding to the remote or local datastore type. This block will be used in read/write of dataset paths.
+"""
+function block_selector(ds::Dataset)
+    datablocks = PrefectDatastoreType()
+    return PrefectBlock(getproperty(datablocks, Symbol(ds.datastore_type)))
+end
+
+# TODO: rundate_type basically ignored if not current date.
+function rundate_path_selector(ds::Dataset)
+    if ds.rundate != Dates.today()
+        return ds.dataset_path
+    elseif ds.rundate_type == "latest"
+        return ds.latest_path
+    else
+        return ds.dataset_path
+    end
+end
