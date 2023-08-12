@@ -1,11 +1,3 @@
-# PREFECT_API_URL is needed to call the Prefect server and get Block information.
-using ConfigEnv
-
-dotenv("src/.env", ".env"; overwrite = false)
-# TODO: this doesn't make any sense. dotenv call needs to happen during the new julia session after `using PrefectInterfaces`. putting `dotenv` in the package just happends when compiling, but not shared the the julia environment on REPL. maybe? during runtests.jl I was getting ENV vars from this...
-#   prob something like init_from_dotenv() that grabs ENV variables for current prefect config.
-#   TODO: akshually, dotenv should be for tests only, package user deals with this.
-
 """
     PrefectAPI(url::String) <:AbstractPrefectInterface
 

@@ -1,11 +1,14 @@
 # TODO
-TODO: tests all broken after v0.2.0 refactor
-TODO: write_path/read_path shouldnt only support dataframes, allow to specify sink type
+TODO: redo all tests, can initialize prefect or just create blocks by constructor.
+
+----------
 TODO: read/write remote s3 bucket
-TODO: docs are out of sync. README very basic, install and test in julia clean up.
+TODO: write_path/read_path shouldnt only support dataframes, allow to specify sink type
+TODO: docs are out of sync. README should very basic, install and test in julia clean up.
 TODO: init() command to execute dotenv()? that gets those env into environment, not 'using'...
     * create a Config type to hold the dotenv() dict for keys with "PREFECT_*" prefix. 
     * see dataset.jl
+    * actually dotenv is a test dependency, and env mgmt is for the user application
 
 
 
