@@ -1,20 +1,23 @@
 # TODO
-TODO: redo all tests, can initialize prefect or just create blocks by constructor.
-
+TODO: split Dataset into new module. Not the same.
+TODO: write_path/read_path should file write, composable CSV.write function
+TODO: ds.rundate_type basically ignored if not current date.
+    * but if you want to read the latest dataset, your today rundate isnt what the actual rundate was
+    * a mental mismatch could prob ignore, but if you explicitly "latest" then thats what you should get.
 ----------
 TODO: read/write remote s3 bucket
-TODO: write_path/read_path shouldnt only support dataframes, allow to specify sink type
 TODO: docs are out of sync. README should very basic, install and test in julia clean up.
-TODO: init() command to execute dotenv()? that gets those env into environment, not 'using'...
-    * create a Config type to hold the dotenv() dict for keys with "PREFECT_*" prefix. 
-    * see dataset.jl
-    * actually dotenv is a test dependency, and env mgmt is for the user application
 
 
 
+DONE: redo all tests, can initialize prefect or just create blocks by constructor.
 DONE: PrefectBlock.write_path, write(Dataset)
 DONE: make a toy prefect instance, prefect poetry project directory to start a local server
 DONE: justfile is janky, mostly not used. prob after testing setup. FIXED, usable.
+NODO: init() command to execute dotenv()? that gets those env into environment, not 'using'...
+    * create a Config type to hold the dotenv() dict for keys with "PREFECT_*" prefix. 
+    * see dataset.jl
+    * **actually dotenv is a test dependency**, and env mgmt is for the user application
 
 ----------
 ## DONE: PROBLEM: PREFECT_API_URL

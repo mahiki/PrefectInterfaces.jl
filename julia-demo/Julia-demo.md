@@ -144,4 +144,4 @@ ENV["PREFECT_REMOTE_DATA_BLOCK"]
     # "s3-bucket/willowdata"
 ```
 
-The variable PREFECT_REMOTE_DATA_BLOCK is used by the `PrefectDatastoreType` to return the names of your Prefect blocks which define remote or local storage.
+The variable PREFECT_REMOTE_DATA_BLOCK is used by the `PrefectDatastoreNames` to return the names of your Prefect blocks which define remote or local storage.
