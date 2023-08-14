@@ -20,7 +20,7 @@ Supported keyword arguments (default show first):
 # Examples
 ```jldoctest
 julia> begin
-    ENV["PREFECT_LOCAL_DATA_BLOCK"] = "local-file-system/willowdata"
+    ENV["PREFECT_DATA_BLOCK_LOCAL"] = "local-file-system/willowdata"
     ENV["PREFECT_API_URL"] = "http://127.0.0.1:4300/api"
 end;
 
@@ -78,7 +78,7 @@ Returns a `DataFrame` by calling `CSV.read` on a filepath defined by the Dataset
 ```jldoctest
 julia> begin
     ENV["PREFECT_API_URL"] = "http://127.0.0.1:4300/api"
-    ENV["PREFECT_LOCAL_DATA_BLOCK"] = "local-file-system/willowdata"
+    ENV["PREFECT_DATA_BLOCK_LOCAL"] = "local-file-system/willowdata"
 end;
 
 julia> df = read(Dataset(dataset_name="test_table", datastore_type="local"))
@@ -95,7 +95,7 @@ function read(
     )
     @warn "remote datastore read/write not supported yet"
     prefect_block = block
-    path_key = rundate_path_selector(ds)
+    path_key = rundate_path_selector(ds).read
     prefect_block.block.read_path(path_key)
 end
 
@@ -111,8 +111,8 @@ function write(
     )
     @warn "remote datastore read/write not supported yet"
     prefect_block = block
-    path_key = rundate_path_selector(ds)
-    prefect_block.block.write_path(path_key, df)
+    path_key = rundate_path_selector(ds).write
+    [prefect_block.block.write_path(x, df) for x in path_key]
 end
 
 
