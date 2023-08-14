@@ -1,5 +1,11 @@
 using CSV, DataFrames
 
+struct StringBlock <: AbstractPrefectBlock
+    blockname::String
+    blocktype::String
+    value::String
+end
+
 """
 	SecretString(secret::String) <:Any
 
@@ -52,6 +58,7 @@ struct LocalFSBlock <: AbstractPrefectBlock
     basepath::String
     read_path::Function
     write_path::Function
+    # TODO: should be to filesystem write, CSV write function composable if data is csv
     LocalFSBlock(blockname, blocktype, basepath) =
         new(blockname, blocktype, basepath
             , x -> CSV.read("$basepath/$x", DataFrame)
@@ -60,12 +67,6 @@ struct LocalFSBlock <: AbstractPrefectBlock
                 CSV.write("$basepath/$x", df)
                 end
         )
-end
-
-struct StringBlock <: AbstractPrefectBlock
-    blockname::String
-    blocktype::String
-    value::String
 end
 
 struct AWSCredentialsBlock <: AbstractPrefectBlock

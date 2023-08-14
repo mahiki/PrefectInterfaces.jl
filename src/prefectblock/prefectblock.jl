@@ -10,6 +10,7 @@ Constructors:
     PrefectBlock(blockname::String, api_url::String)
 
 Returns a Prefect Block from the Prefect server, the block data is stored in the `block` field. Prefect Block names are strings called 'slugs', formatted as `block-type-name/block-name`.
+A Prefect Block is uniquely specified by its name and the Prefect DB where it is stored, therefore the API URL is necessary for the constructor.
 
 The AbstractPrefectBlock types are meant to mirror the functionality defined in the Prefect Python API, for example `LocalFSBlock` has a `write_path()` method attached which only writes to paths relative from the block basepath.
 
@@ -122,10 +123,10 @@ function getblock(blockname::String; api_url::String=PrefectAPI().url)
             )
         return JSON.parse(String(response.body))
     catch ex
-        if typeof(ex) ∈ [HTTP.Exceptions.StatusError, HTTP.ConnectError]
-             @error "requested block not found." api_url blockname
-             println("$ex")
-             return nothing
+        if typeof(ex) == HTTP.Exceptions.StatusError && ex.status == 404
+            @error "Status: $(ex.status): $(String(ex.response.body))" api_url blockname
+        elseif typeof(ex) == HTTP.ConnectError
+            @error "$(ex.error.ex)" api_url blockname
         else
             rethrow()
         end

@@ -1,52 +1,59 @@
+#=  ================================================================================================
+    Test module
+
+    usage options:
+        julia --project=. -startup-file=no --eval 'import Pkg; Pkg.test()'
+        just test   (will load dotenv)
+        ] activate .; test
+
+    note:   tests run in ./test folder
+=   ===============================================================================================#
+
 using Test
 using PrefectInterfaces
+using ConfigEnv
+using TOML
 using HTTP
 
-println("### TODO: all these tests are broken since v0.2.0 change")
-# TODO: tests: list blocks, load blocks, write to dataset, read from dataset. see install doc
+const PROJECT_ROOT = pkgdir(PrefectInterfaces)
+const PREFECT_PROFILES = TOML.tryparsefile("$PROJECT_ROOT/prefect/profiles.toml")
+const ACTIVE_API = begin
+    active = PREFECT_PROFILES["active"]
+    PREFECT_PROFILES["profiles"][active]["PREFECT_API_URL"]
+end
+
+dotenv("$PROJECT_ROOT/.env"; overwrite=false);
 
 println()
 println("# SERVER HEALTH CHECK #")
 println("# =================== #")
-println("Prefect Server must be running (`prefect server start`)")
+@info "Prefect Server must be running (`prefect server start`)"
 
-# TODO: just do API_URL here
-for (k, v) in PrefectInterfaces.ENV_API
-    println("Environment: $k")
-    try
-        response = HTTP.get(v)
-        println("Server $v reponse STATUS: $(response.status) OK")
-    catch ex
-        println("Prefect Server Not Healthy: $(ex.url) $(ex.error.ex.msg)")
-        exit(420) 
-    end
-end
+include("server/server-connection-check.jl")
 
-println()
-println("# DUMP ENV BECAUSE FOR SOME REASON THESE DONT SHOW IN TESTS #")
-println("# ========================================================= #")
-println(ENV)
+
 
 println()
 println("# BEGIN UNIT TESTS #")
 println("# ================ #")
 println()
 
-@testset "‡‡‡‡‡‡‡‡        All tests                      ‡‡‡‡‡‡‡‡    " begin
+@testset verbose=true "All tests" begin
 
-    @testset "‡‡‡‡‡‡    Config and environment tests           ‡‡‡‡‡‡    " begin
+    @testset "Config" begin
 
         include("config/config.jl")
         
     end
 
-    @testset "‡‡‡‡‡‡    Prefect Block types and function tests ‡‡‡‡‡‡    " begin
+    @testset "Block types, function tests" begin
 
         include("prefectblock/prefectblock.jl")
+        include("prefectblock/prefectblocktypes.jl")
 
     end
 
-    @testset "‡‡‡‡‡‡    Dataset read/write tests               ‡‡‡‡‡‡    " begin
+    @testset "Dataset function" begin
 
         include("dataset/dataset.jl")
 

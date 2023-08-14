@@ -1,78 +1,40 @@
-using PrefectInterfaces
-using DataFrames
+# PREFECT BLOCK CONSTRUCTOR #
+# ========================= #
 
-# Validate Constructors #
-# ===================== #
+blocklist = ls().blocks
+strname = filter(x -> contains(x, "string"), blocklist)[1]
+fsname = filter(x -> contains(x, "local-file"), blocklist)[1]
+@test strname == "string/syrinx"
+@test fsname == "local-file-system/willowdata"
 
-password = SecretString("abcd1234")
-@test repr(password) == "####Secret####"
-@test password.secret == "abcd1234"
+strblock = PrefectBlock(strname)
+@test typeof(strblock) == PrefectBlock
+@test typeof(strblock.block) == StringBlock
+@test fieldnames(typeof(strblock)) == (:blockname, :block)
+@test fieldnames(typeof(strblock.block)) == (:blockname, :blocktype, :value)
+@test strblock.blockname == strblock.block.blockname
+@test strblock.block.blocktype == "string"
+@test strblock.block.value == "main"
 
-# this changes depending on `just test` or julia --eval 'Pkg.test()' and current branch
-defaultendpoint = PrefectAPI()
-@test defaultendpoint.url == "http://127.0.0.1:4200/api"
+# test specified api url
+strblock2 = PrefectBlock(strname, ACTIVE_API)
+@test strblock2 == strblock
 
-devendpoint = PrefectAPI("http://127.0.0.1:4244/api")
-@test devendpoint.url == "http://127.0.0.1:4244/api"
+fsblock = PrefectBlock(fsname)
+@test typeof(fsblock) == PrefectBlock
+@test typeof(fsblock.block) == LocalFSBlock
+@test fieldnames(typeof(fsblock)) == (:blockname, :block)
+@test fieldnames(typeof(fsblock.block)) == (:blockname, :blocktype, :basepath, :read_path, :write_path)
+@test fsblock.blockname == fsblock.block.blockname
+@test fsblock.block.blocktype == "local-file-system"
+@test fsblock.block.basepath == "$(homedir())/willowdata/main"
 
-defaultfsblock = PrefectBlock("local-file-system/willowdata")
-@test defaultfsblock.blockname == "local-file-system/willowdata"
-@test defaultfsblock.blocktype == "local-file-system"
-@test defaultfsblock.name == "datastore"
-@test defaultfsblock.env == "main"
-@test defaultfsblock.api == "http://127.0.0.1:4200/api"
+# getblock function
+@test typeof(getblock(strname)) <: AbstractDict
+@test typeof(getblock(fsname)) <: AbstractDict
+@test getblock(strname)["name"] == "syrinx"
+@test getblock(fsname)["name"] == "willowdata"
 
-devfsblock = PrefectBlock("local-file-system/willowdata", "dev")
-@test devfsblock.blockname == "local-file-system/willowdata"
-@test devfsblock.slug == "local-file-system"
-@test devfsblock.name == "datastore"
-@test devfsblock.env == "dev"
-@test devfsblock.api == "http://127.0.0.1:4209/api"
-
-mains3block = PrefectBlock("s3-bucket/willowdata", "main")
-@test mains3block.blockname == "s3-bucket/willowdata"
-@test mains3block.slug == "s3-bucket"
-@test mains3block.name == "datastore"
-@test mains3block.env == "main"
-@test mains3block.api == "http://127.0.0.1:4200/api"
-
-awscredentials = AWSCredentialsBlock("us-west-2", "AKIAXXXX1234XXXX1234", "GRU999999BOO")
-@test awscredentials.region_name == "us-west-2"
-@test awscredentials.aws_access_key_id == "AKIAXXXX1234XXXX1234"
-@test repr(awscredentials.aws_secret_access_key) == "####Secret####"
-@test awscredentials.aws_secret_access_key.secret == "GRU999999BOO"
-
-
-# Validate load from Prefect Server #
-# ================================= #
-
-defaultfsloaded = load(defaultfsblock)
-@test typeof(defaultfsloaded) == PrefectInterfaces.LocalFSBlock
-@test defaultfsloaded.blockname == "local-file-system/willowdata"
-@test defaultfsloaded.blocktype == "local-file-system"
-@test defaultfsloaded.basepath == expanduser("~/willowdata/projectname/main")
-
-devfsloaded = load(devfsblock)
-@test typeof(devfsloaded) == PrefectInterfaces.LocalFSBlock
-@test devfsloaded.blockname == "local-file-system/willowdata"
-@test devfsloaded.blocktype == "local-file-system"
-@test devfsloaded.basepath == expanduser("~/willowdata/projectname/dev")
-
-defaults3loaded = load(mains3block)
-@test typeof(defaults3loaded) == PrefectInterfaces.S3BucketBlock
-@test defaults3loaded.blockname == "s3-bucket/willowdata"
-@test defaults3loaded.blocktype == "s3-bucket"
-@test typeof(defaults3loaded.credentials) == AWSCredentialsBlock
-@test repr(defaults3loaded.credentials.aws_secret_access_key) == "####Secret####"
-
-
-# Validate read from LocalFSBlock #
-# =============================== #
-
-lfsb_basepath = expanduser("~/repo/julia-pkgs/PrefectInterfaces/test/artifacts")
-lfsb_data_key = "local-fs-block/data.csv"
-lfsb = LocalFSBlock("local-file-system/willowdata", "local-file-system", lfsb_basepath)
-lfsb_df = lfsb.read_path(lfsb_data_key)
-@test typeof(lfsb_df) == DataFrames.DataFrame
-@test nrow(lfsb_df) == 6
-@test lfsb_df[1, :item] == "B001"
+# makeblock function 
+@test typeof(makeblock(getblock(fsname))) == LocalFSBlock
+@test typeof(makeblock(getblock(strname))) == StringBlock

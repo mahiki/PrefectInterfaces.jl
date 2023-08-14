@@ -48,12 +48,12 @@ julia> df = read(ds)
     dataset_name::String
     datastore_type::String = begin
         @warn "datastore_type = remote not supported yet"
-        "remote"
+        "local"
     end
     dataset_type::String = "extracts"
     file_format::String = "csv"
     rundate::Date = Dates.today()
-    rundate_type::String = "latest"
+    rundate_type::String = rundate != Dates.today() ? "specific" : "latest"
     dataset_path::String = "$dataset_type/$file_format/dataset=$dataset_name/rundate=$rundate/data.csv"
     latest_path::String = "$dataset_type/$file_format/latest/dataset=$dataset_name/data.csv"
     image_path::String = begin
@@ -64,7 +64,7 @@ julia> df = read(ds)
     @assert datastore_type ∈ ["local", "remote"]
     @assert rundate_type ∈ ["latest", "specific"]
     @assert file_format ∈ ["csv"]
-    # TODO: image path and filename doesnt quite make sense as seperate field. also, this is ugly looking.
+    # TODO: image path and filename doesnt quite make sense as seperate field. also, this is ugly looking. maybe ../image.xxx, suffix must carry through
 end
 
 
@@ -89,9 +89,12 @@ julia> df = read(Dataset(dataset_name="test_table", datastore_type="local"))
    1 │ If you can select this table you…  PASSED
 ```
 """
-function read(ds::Dataset)
+function read(
+    ds::Dataset
+    ; block::AbstractPrefectBlock = block_selector(ds)
+    )
     @warn "remote datastore read/write not supported yet"
-    prefect_block = block_selector(ds)
+    prefect_block = block
     path_key = rundate_path_selector(ds)
     prefect_block.block.read_path(path_key)
 end
@@ -101,9 +104,13 @@ end
 
 Writes a `DataFrame` via `CSV.write` to a filepath defined by the `Dataset` type.
 """
-function write(ds::Dataset, df::AbstractDataFrame)
+function write(
+    ds::Dataset
+    , df::AbstractDataFrame
+    ; block::AbstractPrefectBlock = block_selector(ds)
+    )
     @warn "remote datastore read/write not supported yet"
-    prefect_block = block_selector(ds)
+    prefect_block = block
     path_key = rundate_path_selector(ds)
     prefect_block.block.write_path(path_key, df)
 end
@@ -115,17 +122,31 @@ end
 Returns the PrefectBlock corresponding to the remote or local datastore type. This block will be used in read/write of dataset paths.
 """
 function block_selector(ds::Dataset)
-    datablocks = PrefectDatastoreType()
+    datablocks = PrefectDatastoreNames()
     return PrefectBlock(getproperty(datablocks, Symbol(ds.datastore_type)))
 end
 
-# TODO: rundate_type basically ignored if not current date.
+
 function rundate_path_selector(ds::Dataset)
-    if ds.rundate != Dates.today()
-        return ds.dataset_path
-    elseif ds.rundate_type == "latest"
-        return ds.latest_path
+    if ds.rundate_type == "latest"
+        if ds.rundate == Dates.today()
+            return (read=ds.latest_path, write=[ds.latest_path, ds.dataset_path])
+        else
+            return (read=ds.dataset_path, write=[ds.latest_path])
+        end
     else
-        return ds.dataset_path
+        return (read=ds.dataset_path, write=[ds.dataset_path])
     end
 end
+
+
+# latest and specific read/write paths - "latest" is convenient to point to
+# if explicitly "latest" then thats what you should get.
+#=
+    rundate_type  rundate       read     write
+    ------------|------------|---------|-----------------------------------------
+    latest        == today   |  latest   [latest, rundate]   default option
+    latest        != today   |  rundate  [latest]            dont write to date partition (rare)
+    specific      == today   |  rundate  [rundate]
+    specific      != today   |  rundate  [rundate]
+=#
