@@ -55,7 +55,7 @@ Calls the Prefect server and returns a list of all defined blocks as Vector{Stri
 
 # Examples:
 ```jldoctest
-julia> ENV["PREFECT_API_URL"] = "http://127.0.0.1:4209/api";
+julia> ENV["PREFECT_API_URL"] = "http://127.0.0.1:4300/api";
 
 julia> ls()
 11-element Vector{Any}:
@@ -187,7 +187,13 @@ function makeblock(block_api_data::Dict)
             , blocktype
             , block_api_data["data"]["value"]
             )
-        _ => throw(ArgumentError("""block type: "$blocktype" not currently supported in PrefectInterfaces."""))
+        "secret" =>
+        SecretBlock(
+            blockname
+            , blocktype
+            , block_api_data["data"]["value"]
+        )
+        _ => throw(ArgumentError("""block type "$blocktype" not currently supported in PrefectInterfaces."""))
     end
     return newblock
 end

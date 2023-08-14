@@ -1,6 +1,6 @@
 #   This block is added to each prefect DB instance to disambiguate prod/dev paths, etc.
 #   usage:
-#       PREFECT_ENV="dev" poetry run prefect block register --file src/blocks/str_prefect_env.py
+#       PREFECT_ENV="main" poetry run prefect block register --file src/blocks/str_prefect_env.py
 
 import os
 from prefect.blocks.system import String

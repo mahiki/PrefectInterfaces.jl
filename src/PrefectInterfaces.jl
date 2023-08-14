@@ -9,7 +9,7 @@ Use of this package requires a running Prefect server to make connections to the
 # Examples
 ```jldoctest
 julia> using PrefectInterfaces
-julia> ENV["PREFECT_API_URL"] = "http://127.0.0.1:4209/api";
+julia> ENV["PREFECT_API_URL"] = "http://127.0.0.1:4300/api";
 
 julia> ls()
 5-element Vector{Any}:

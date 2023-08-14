@@ -21,7 +21,7 @@ Supported keyword arguments (default show first):
 ```jldoctest
 julia> begin
     ENV["PREFECT_LOCAL_DATA_BLOCK"] = "local-file-system/willowdata"
-    ENV["PREFECT_API_URL"] = "http://127.0.0.1:4209/api"
+    ENV["PREFECT_API_URL"] = "http://127.0.0.1:4300/api"
 end;
 
 julia> ds = Dataset(dataset_name="test_table", datastore_type="local")
@@ -77,7 +77,7 @@ Returns a `DataFrame` by calling `CSV.read` on a filepath defined by the Dataset
 # Examples
 ```jldoctest
 julia> begin
-    ENV["PREFECT_API_URL"] = "http://127.0.0.1:4209/api"
+    ENV["PREFECT_API_URL"] = "http://127.0.0.1:4300/api"
     ENV["PREFECT_LOCAL_DATA_BLOCK"] = "local-file-system/willowdata"
 end;
 

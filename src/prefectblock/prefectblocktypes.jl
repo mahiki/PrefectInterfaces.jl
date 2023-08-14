@@ -30,6 +30,14 @@ end
 Base.show(io::IO, s::SecretString) = print(io, "####Secret####")
 Base.dump(io::IO, s::SecretString; maxdepth=1) = print(io, "SecretString")
 
+struct SecretBlock <: AbstractPrefectBlock
+    blockname::String
+    blocktype::String
+    value::SecretString
+    SecretBlock(blockname, blocktype, value) = 
+        new(blockname, blocktype, SecretString(value))
+end
+
 """
     LocalFSBlock(blockname::String, blocktype::String, basepath::String)
 
