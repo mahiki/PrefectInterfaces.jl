@@ -1,4 +1,9 @@
-# PrefectInterfaces - Commands That Call a Running Prefect Server
+# Julia Demo
+This demonstrates interacting with a running Prefect DB from the Julia REPL. If you don't have a Prefect Server instance running, [go back to the Prefect Install doc first](../prefect/README.md).
+
+[See files in the test](../test) folder for examples of Block usage and loading data from Prefect DB, some require the Prefect DB to run and some test simply construct dummy objects.
+
+Entering the Julia REPL from the `just julia` command will inject the `.env` variables.
 ```sh
 cd ./prefect/
 just launch
@@ -11,17 +16,16 @@ cd ../julia-demo
 
 # start julia in current project, env vars will be loaded as well
 just julia
-
-# alternately, this justfile script will load the ENV variables:
 ```
 
 ## EXAMPLES
-TODO: Below we add the repo URL manually, as PrefectInterfaces is not registered yet.
-
+* Call the `PrefectAPI` function
+* Access the secret string in an AWS Credentials block via `.secret` field
+  
 ```julia
 # go into Pkg mode
 ] status
-pkg> add https://github.com/mahiki/PrefectInterfaces.jl.git
+pkg> add https://github.com/mahiki/PrefectInterfaces.jl
 pkg> instantiate
 
 # back to julia prompt
@@ -30,55 +34,23 @@ julia> using PrefectInterfaces
 PrefectAPI().url
     # "http://127.0.0.1:4300/api"
 
-# list all the blocks currently loaded in the Prefect DB
-db = ls()
-(blocks = ["local-file-system/willowdata", "string/syrinx"],)
+PrefectAPI("http://127.0.0.1:4444/api").url
+    # "http://127.0.0.1:4444/api"
 
-# now lets try loading the block information from the Prefect server:
-env = PrefectBlock("string/syrinx");
-env.block.value
-    # "main"
+# Construct and example, normally this is pulled from DB with PrefectBlock("aws-credentials/subdivisions")
+creds = AWSCredentialsBlock(
+    "aws-credentials/subdivisions"
+    , "aws-credentials"
+    , "us-west-2"
+    , "AKIAXXX999XXX999"
+    , "GUUxx87987xxPXH")
+AWSCredentialsBlock("aws-credentials/subdivisions", "aws-credentials", "us-west-2", "AKIAXXX999XXX999", ####Secret####)
 
-# The prefect LocalFileSystemBlock helps us read/write to a local filesystem
-fs = PrefectBlock(db.blocks[1]);
-dump(fs)
-    # PrefectBlock
-    #   blockname: String "local-file-system/willowdata"
-    #   block: LocalFSBlock
-    #     blockname: String "local-file-system/willowdata"
-    #     blocktype: String "local-file-system"
-    #     basepath: String "<HOME>/willowdata/main"
-    #     read_path: #4 (function of type PrefectInterfaces.var"#4#6"{String})
-    #       basepath: String "<HOME>/willowdata/main"
-    #     write_path: #5 (function of type PrefectInterfaces.var"#5#7"{String})
-    #       basepath: String "<HOME>/willowdata/main"
+creds.aws_secret_access_key
+####Secret####
 
-using DataFrames
-df = DataFrame(flag = [false, true, false, true, false, true]
-    , amt = [19.00, 11.00, 35.50, 32.50, 5.99, 5.99]
-    , qty = [1, 4, 1, 3, 21, 109]
-    , ship = [.50, .50, 1.50, .55, 0.0, 1.99]
-    , item = ["B001", "B001", "B020", "B020", "BX00", "BX00"]
-    , day = ["2021-01-01", "2021-01-01", "2112-12-12", "2020-10-20", "2021-05-04", "1984-07-04"]
-    );
-
-# The LocalFSBlock type has a `write_path` method that writes to the local location
-#   defined by the block 'local-file-system/willowdata'
-
-fs.block.write_path("test_write_df/data.csv", df)
-    # "<HOME>/willowdata/main/test_write_df/data.csv"
-
-df2 = fs.block.read_path("test_write_df/data.csv")
-    # 6×6 DataFrame
-    #  Row │ flag   amt      qty    ship     item     day
-    #      │ Bool   Float64  Int64  Float64  String7  Date
-    # ─────┼─────────────────────────────────────────────────────
-    #    1 │ false    19.0       1     0.5   B001     2021-01-01
-    #    2 │  true    11.0       4     0.5   B001     2021-01-01
-    #    3 │ false    35.5       1     1.5   B020     2112-12-12
-    #    4 │  true    32.5       3     0.55  B020     2020-10-20
-    #    5 │ false     5.99     21     0.0   BX00     2021-05-04
-    #    6 │  true     5.99    109     1.99  BX00     1984-07-04
+creds.aws_secret_access_key.secret
+"GUUxx87987xxPXH"
 ```
 
 There are other `AbstractPrefectBlock` types, see list below. These facilitate interactions with Blocks in your Prefect instance, they are primary organizing abstractions in the Prefect world.
@@ -92,56 +64,139 @@ subtypes(PrefectInterfaces.AbstractPrefectBlock)
     #    PrefectBlock
     #    S3BucketBlock
     #    StringBlock
+    #    SecretBlock
 ```
+
+Shut down the server after exiting julia.
+```sh
+cd ../prefect
+just kill
+```
+
 
 ## DATASET TYPE
 This type is an opinionated means of organizing data artifacts by name.  This is not a part of the Prefect API, and can be disregarded. Dataset is not a dependency of the Prefect types that are meant to constitute an unofficial 'Prefect Julia SDK'.
 
 This is a lightweight organizational construct for reading/writing data artifacts as a part of orchestrated data pipelines. The type merely holds metadata about named data sets and where they should be found or placed in a file system that is defined by a Prefect Block. The data files get arranged in a hive-ish file structure that allows tracking experiment results or daily extracts.
 
-The fields of the Dataset type are populated by env variables (loaded from a `.env` file) or defined in the constructor.
+The fields of the Dataset type are populated by env variables (loaded from a `.env` file) or defined in the constructor. The variables PREFECT_DATA_BLOCK_REMOTE/PREFECT_DATA_BLOCK_LOCAL is used by the `PrefectDatastoreNames` to return the names of your Prefect blocks which define remote or local storage.
 
 ```julia
+ENV["PREFECT_API_URL"] = "http://127.0.0.1:4300/api"
+ENV["PREFECT_DATA_BLOCK_REMOTE"] = "local-file-system/willowdata"
+ENV["PREFECT_DATA_BLOCK_LOCAL"] = "local-file-system/willowdata"    # same, unless you have a remote store registered
+
 ds = Dataset(dataset_name="test_dataset_table", datastore_type="local")
 
+using DataFrames
+df = DataFrame(
+    flag = [false, true, false, true, false, true]
+    , amt = [19.00, 11.00, 35.50, 32.50, 5.99, 5.99]
+    , qty = [1, 4, 1, 3, 21, 109]
+    , item = ["B001", "B001", "B020", "B020", "BX00", "BX00"]
+    , day = ["2021-01-01", "2021-01-01", "2112-12-12", "2020-10-20", "2021-05-04", "1984-07-04"]
+    );
+
 write(ds, df)
-    # "<HOME>/willowdata/main/extracts/csv/latest/dataset=test_dataset_table/data.csv"
+    #  "$HOME/willowdata/main/extracts/csv/latest/dataset=test_dataset_table/data.csv"
+    #  "$HOME/willowdata/main/extracts/csv/dataset=test_dataset_table/rundate=2023-08-14/data.csv"
 
-df3 = read(ds)
-    # 6×6 DataFrame
-    # Row │ flag   amt      qty    ship     item     day
-    #     │ Bool   Float64  Int64  Float64  String7  Date
-    #─────┼─────────────────────────────────────────────────────
-    #   1 │ false    19.0       1     0.5   B001     2021-01-01
-    #   2 │  true    11.0       4     0.5   B001     2021-01-01
-    #   3 │ false    35.5       1     1.5   B020     2112-12-12
-    #   4 │  true    32.5       3     0.55  B020     2020-10-20
-    #   5 │ false     5.99     21     0.0   BX00     2021-05-04
-    #   6 │  true     5.99    109     1.99  BX00     1984-07-04
+dfr = read(ds)
+    # 6×5 DataFrame
+    #  Row │ flag   amt      qty    item     day
+    #      │ Bool   Float64  Int64  String7  Date
+    # ─────┼────────────────────────────────────────────
+    #    1 │ false    19.0       1  B001     2021-01-01
+    #    2 │  true    11.0       4  B001     2021-01-01
+    #    3 │ false    35.5       1  B020     2112-12-12
+    #    4 │  true    32.5       3  B020     2020-10-20
+    #    5 │ false     5.99     21  BX00     2021-05-04
+    #    6 │  true     5.99    109  BX00     1984-07-04
+```
+The `read` and `write` functions are calling the Prefect Server API to retrieve block information, in this case the `LocalFilesystem.basepath` attribute.
 
-df3 == df2
+Notice the `write` function writes to two locations unless rundate_type = "specific":
+```
+tree $HOME/willowdata/main/extracts
+$HOME/willowdata/main/extracts
+└── csv
+    ├── dataset=test_dataset_table
+    │   └── rundate=2023-08-14
+    │       └── data.csv
+    └── latest
+        └── dataset=test_dataset_table
+            └── data.csv
+```
+
+More Dataset features
+```julia
+# writing a specific rundate
+ds1 = Dataset(dataset_name="test_dataset_specific", datastore_type="local", rundate=Date("2112-03-15"))
+    # Dataset
+    #   dataset_name: String "test_dataset_specific"
+    #   datastore_type: String "local"
+    #   dataset_type: String "extracts"
+    #   file_format: String "csv"
+    #   rundate: Date
+    #   rundate_type: String "specific"
+    #   dataset_path: String "extracts/csv/dataset=test_dataset_specific/rundate=2112-03-15/data.csv"
+    #   latest_path: String "extracts/csv/latest/dataset=test_dataset_specific/data.csv"
+    #   image_path: String "extracts/dataset=test_dataset_specific/rundate=2112-03-15"
+
+write(ds1, df)
+    #  "$HOME/willowdata/main/extracts/csv/dataset=test_dataset_specific/rundate=2112-03-15/data.csv"
+
+# note only one path was written. the 'latest_path' was not.
+shell> ls -la "$HOME/willowdata/main/$(ds1.latest_path)"
+    # ls: cannot access '$HOME/willowdata/main/extracts/csv/latest/dataset=test_dataset_specific/data.csv': No such file or directory
+
+shell>  ls -la "$HOME/willowdata/main/$(ds1.dataset_path)"
+    # -rw-r--r-- 1 segovia staff 196 Aug 14 15:45 '$HOME/willowdata/main/extracts/csv/dataset=test_dataset_specific/rundate=2112-03-15/data.csv'
+
+# the 'read' function knows to read the correct path
+df1 = read(ds1);
+
+df1 == dfr
     # true
 ```
 
-That demonstrates the basic functionality of PrefectInterfaces types that can be constructed from the data stored in Prefect blocks.
-
-Shut down the server.
-
-    cd ../prefect
-    just kill
-
-----------
-## EPILOGUE
-**NOTE ABOUT ENV**: The Prefect types pull information from a running Prefect DB, by calling the REST API at env variable PREFECT_API_URL. If the julia REPL session is called from a `just` command, the .env variables will be exported into the environment. In application code you need to either set `ENV["PREFECT_API_URL"]="http://127.0.0.1:4300/api"` or use the `ConfigEnv` package as shown below.
-
-```jl
-# Without using 'just' commands, you can load the .env file this way
-using ConfigEnv
-
-dotenv(".env"; overwrite = false);
-
-ENV["PREFECT_REMOTE_DATA_BLOCK"]
-    # "s3-bucket/willowdata"
+The datastore now looks like this:
+```
+/Users/segovia/willowdata/main/extracts/
+└── csv
+    ├── dataset=test_dataset_specific
+    │   └── rundate=2112-03-15
+    │       └── data.csv
+    ├── dataset=test_dataset_table
+    │   └── rundate=2023-08-14
+    │       └── data.csv
+    └── latest
+        └── dataset=test_dataset_table
+            └── data.csv
 ```
 
-The variable PREFECT_REMOTE_DATA_BLOCK is used by the `PrefectDatastoreNames` to return the names of your Prefect blocks which define remote or local storage.
+----------
+## ENVIRONMENT
+**NOTE ABOUT ENV**: The Prefect types pull information from a running Prefect DB, by calling the REST API at env variable PREFECT_API_URL. If the julia REPL session is called from a `just` command, the .env variables will be exported into the environment. In application code you need to either set `ENV["PREFECT_API_URL"]="http://127.0.0.1:4300/api"` or use the `ConfigEnv` package as shown below.
+
+Loading environment variables from the `.env` file, from the Julia application.
+
+The `Dataset` read/write functions depend on the local and remote data block names being defined in environment variables.
+```jl
+# .env file imported with ConfigEnv.dotent(), or just assignment:
+using ConfigEnv
+dotenv(".env", overwrite=false)
+
+# all the Prefect env variables are now loaded into the Julia environment
+ENV["PREFECT_DATA_BLOCK_REMOTE"]
+    # "s3-bucket/willowdata"
+
+# or just set them manually
+begin
+    ENV["PREFECT_API_URL"] = "http://127.0.0.1:4300/api"
+    ENV["PREFECT_DATA_BLOCK_LOCAL"] = "local-file-system/willowdata"
+    ENV["PREFECT_DATA_BLOCK_REMOTE"] = "local-file-system/willowdata"
+end
+```
+
+For interactive work, entering the Julia REPL from the `just julia` command will inject the `.env` variables.

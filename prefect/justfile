@@ -6,7 +6,6 @@
 #   PREFECT_API_URL is managed in profiles.toml, and it determines which DB is 
 #     being connected in calls to prefect.
 
-# not generally needed
 set dotenv-load := true
 
 # the prefect cli needs a profiles.toml to define API URL and other configs
@@ -52,6 +51,20 @@ ls:
   poetry run prefect block ls
   poetry run prefect deployment ls
 
+# enter pypython REPL with justfile env vars loaded
+repl:
+  poetry run ptpython
+
+# register all blocks for bootstrap setup, including secrets, slack, etc
+registerall: && ls
+  PREFECT_ENV={{use_branch}} poetry run prefect block register --file src/blocks/str_prefect_env.py
+  poetry run prefect block register --file src/blocks/fs_willowdata.py
+  poetry run prefect block register --file src/blocks/secret_necromancer.py
+
+
+########   PREFECT SERVER   ########
+####################################
+
 # launch service: start a local Prefect Server and Prefect Agent in detached tmux sessions
 launch: && mux
   #!/usr/bin/env bash
@@ -76,16 +89,6 @@ view env='main':
   @echo "Attaching tmux session, to detach from TMUX: Ctrl-b, d"
   @sleep 2
   @tmux attach-session -t pi-{{env}} || echo "Prefect DB tmux session not started, try 'just launch'"
-
-# enter pypython REPL with justfile env vars loaded
-repl:
-  poetry run ptpython
-
-# register all blocks for bootstrap setup, including secrets, slack, etc
-registerall: && ls
-  PREFECT_ENV={{use_branch}} poetry run prefect block register --file src/blocks/str_prefect_env.py
-  poetry run prefect block register --file src/blocks/fs_willowdata.py
-
 
 
 ########   INSTALLATION   ########

@@ -1,7 +1,7 @@
 active = "main"
 
 [profiles.main]
-PREFECT_LOGGING_LEVEL = "INFO"
+PREFECT_LOGGING_LEVEL = "DEBUG"
 PREFECT_SERVER_API_PORT = "4300"
 PREFECT_API_URL = "http://127.0.0.1:4300/api"
 
