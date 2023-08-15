@@ -1,21 +1,21 @@
 # Julia Demo
 This demonstrates interacting with a running Prefect DB from the Julia REPL. If you don't have a Prefect Server instance running, [go back to the Prefect Install doc first](../prefect/README.md).
 
-[See files in the test](../test) folder for examples of Block usage and loading data from Prefect DB, some require the Prefect DB to run and some test simply construct dummy objects.
+[See files in the test](../test) folder for examples of Block usage and loading data from Prefect DB, some require the Prefect DB to run and some tests simply construct dummy objects without connecting to Prefect.
 
 Entering the Julia REPL from the `just julia` command will inject the `.env` variables.
 ```sh
-cd ./prefect/
-just launch
+$ cd ./prefect/
+$ just launch
 
     # to verify server is running, and the API PORT:
     just view main
     # CTRL-b, d to exit
 
-cd ../julia-demo
+$ cd ../julia-demo
 
 # start julia in current project, env vars will be loaded as well
-just julia
+$ just julia
 ```
 
 ## EXAMPLES
@@ -23,7 +23,7 @@ just julia
 * Access the secret string in an AWS Credentials block via `.secret` field
   
 ```julia
-# go into Pkg mode
+# julia> go into Pkg mode
 ] status
 pkg> add https://github.com/mahiki/PrefectInterfaces.jl
 pkg> instantiate
@@ -37,7 +37,8 @@ PrefectAPI().url
 PrefectAPI("http://127.0.0.1:4444/api").url
     # "http://127.0.0.1:4444/api"
 
-# Construct and example, normally this is pulled from DB with PrefectBlock("aws-credentials/subdivisions")
+# Construct an example, normally this is pulled from DB if such a block 
+#   exists with PrefectBlock("aws-credentials/subdivisions")
 creds = AWSCredentialsBlock(
     "aws-credentials/subdivisions"
     , "aws-credentials"
@@ -52,6 +53,7 @@ creds.aws_secret_access_key
 creds.aws_secret_access_key.secret
 "GUUxx87987xxPXH"
 ```
+The secret is obfuscated, to prevent it being visible in logs. 
 
 There are other `AbstractPrefectBlock` types, see list below. These facilitate interactions with Blocks in your Prefect instance, they are primary organizing abstractions in the Prefect world.
 
@@ -69,24 +71,24 @@ subtypes(PrefectInterfaces.AbstractPrefectBlock)
 
 Shut down the server after exiting julia.
 ```sh
-cd ../prefect
-just kill
+$ cd ../prefect
+$ just kill
 ```
 
 
 ## DATASET TYPE
 This type is an opinionated means of organizing data artifacts by name.  This is not a part of the Prefect API, and can be disregarded. Dataset is not a dependency of the Prefect types that are meant to constitute an unofficial 'Prefect Julia SDK'.
 
-This is a lightweight organizational construct for reading/writing data artifacts as a part of orchestrated data pipelines. The type merely holds metadata about named data sets and where they should be found or placed in a file system that is defined by a Prefect Block. The data files get arranged in a hive-ish file structure that allows tracking experiment results or daily extracts.
+This is a lightweight organizational construct for reading/writing data artifacts as a part of orchestrated data pipelines. The type merely holds metadata about named data sets and where they should be found or placed in a file system that is defined by a Prefect Block. The data files get arranged in a hive-ish file structure that allows tracking experiment results or daily extracts. The layout assumes partitions of daily data, additing additional partitions to the struct definition wouldn't be difficult.
 
 The fields of the Dataset type are populated by env variables (loaded from a `.env` file) or defined in the constructor. The variables PREFECT_DATA_BLOCK_REMOTE/PREFECT_DATA_BLOCK_LOCAL is used by the `PrefectDatastoreNames` to return the names of your Prefect blocks which define remote or local storage.
 
 ```julia
 ENV["PREFECT_API_URL"] = "http://127.0.0.1:4300/api"
-ENV["PREFECT_DATA_BLOCK_REMOTE"] = "local-file-system/willowdata"
-ENV["PREFECT_DATA_BLOCK_LOCAL"] = "local-file-system/willowdata"    # same, unless you have a remote store registered
+ENV["PREFECT_DATA_BLOCK_LOCAL"] = "local-file-system/willowdata"
+ENV["PREFECT_DATA_BLOCK_REMOTE"] = "local-file-system/willowdata"    # same, unless you have a remote store registered
 
-ds = Dataset(dataset_name="test_dataset_table", datastore_type="local")
+ds = Dataset(dataset_name="limelight_moving_pictures", datastore_type="local")
 
 using DataFrames
 df = DataFrame(
@@ -98,37 +100,31 @@ df = DataFrame(
     );
 
 write(ds, df)
-    #  "$HOME/willowdata/main/extracts/csv/latest/dataset=test_dataset_table/data.csv"
-    #  "$HOME/willowdata/main/extracts/csv/dataset=test_dataset_table/rundate=2023-08-14/data.csv"
+    #  "$HOME/willowdata/main/extracts/csv/latest/dataset=limelight_moving_pictures/data.csv"
+    #  "$HOME/willowdata/main/extracts/csv/dataset=limelight_moving_pictures/rundate=2023-08-14/data.csv"
 
 dfr = read(ds)
     # 6×5 DataFrame
     #  Row │ flag   amt      qty    item     day
-    #      │ Bool   Float64  Int64  String7  Date
-    # ─────┼────────────────────────────────────────────
-    #    1 │ false    19.0       1  B001     2021-01-01
-    #    2 │  true    11.0       4  B001     2021-01-01
-    #    3 │ false    35.5       1  B020     2112-12-12
-    #    4 │  true    32.5       3  B020     2020-10-20
-    #    5 │ false     5.99     21  BX00     2021-05-04
-    #    6 │  true     5.99    109  BX00     1984-07-04
+    #  ... etc
 ```
+
 The `read` and `write` functions are calling the Prefect Server API to retrieve block information, in this case the `LocalFilesystem.basepath` attribute.
 
-Notice the `write` function writes to two locations unless rundate_type = "specific":
+Notice the `write` function writes to two locations unless `rundate_type="specific"`. This is for the use-case of running a backfill of historical daily data without affecting the 'latest' path.
 ```
 tree $HOME/willowdata/main/extracts
 $HOME/willowdata/main/extracts
 └── csv
-    ├── dataset=test_dataset_table
+    ├── dataset=limelight_moving_pictures
     │   └── rundate=2023-08-14
     │       └── data.csv
     └── latest
-        └── dataset=test_dataset_table
+        └── dataset=limelight_moving_pictures
             └── data.csv
 ```
 
-More Dataset features
+Reading/writing a specific rundate:
 ```julia
 # writing a specific rundate
 ds1 = Dataset(dataset_name="test_dataset_specific", datastore_type="local", rundate=Date("2112-03-15"))
@@ -167,19 +163,17 @@ The datastore now looks like this:
     ├── dataset=test_dataset_specific
     │   └── rundate=2112-03-15
     │       └── data.csv
-    ├── dataset=test_dataset_table
+    ├── dataset=limelight_moving_pictures
     │   └── rundate=2023-08-14
     │       └── data.csv
     └── latest
-        └── dataset=test_dataset_table
+        └── dataset=limelight_moving_pictures
             └── data.csv
 ```
 
 ----------
 ## ENVIRONMENT
-**NOTE ABOUT ENV**: The Prefect types pull information from a running Prefect DB, by calling the REST API at env variable PREFECT_API_URL. If the julia REPL session is called from a `just` command, the .env variables will be exported into the environment. In application code you need to either set `ENV["PREFECT_API_URL"]="http://127.0.0.1:4300/api"` or use the `ConfigEnv` package as shown below.
-
-Loading environment variables from the `.env` file, from the Julia application.
+**NOTE ABOUT ENV**: The Prefect types pull information from a running Prefect DB, by calling the REST API at env variable PREFECT_API_URL. If the julia REPL session is called from a `just` command, the .env variables will be exported into the environment. In application code you need to either set `ENV["PREFECT_API_URL"]="http://127.0.0.1:4300/api"` or use the `ConfigEnv` package as shown below to load the `.env` file from the Julia application.
 
 The `Dataset` read/write functions depend on the local and remote data block names being defined in environment variables.
 ```jl
@@ -195,7 +189,7 @@ ENV["PREFECT_DATA_BLOCK_REMOTE"]
 begin
     ENV["PREFECT_API_URL"] = "http://127.0.0.1:4300/api"
     ENV["PREFECT_DATA_BLOCK_LOCAL"] = "local-file-system/willowdata"
-    ENV["PREFECT_DATA_BLOCK_REMOTE"] = "local-file-system/willowdata"
+    ENV["PREFECT_DATA_BLOCK_REMOTE"] = "s3-bucket/willowdata"
 end
 ```
 

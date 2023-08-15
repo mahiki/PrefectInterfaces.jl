@@ -1,11 +1,11 @@
-# Install Prefect Environment, Poetry Commands
+# Install Prefect Environment - Poetry Commands
 This is the same as the [Install section of prefect](README.md#install-prefect-macos), without using the `justfile` taskrunner. It makes the relationship between env variables and Prefect DB location and API more explicit.
 
 ```sh
 brew install pipx just python@3
 pipx install poetry
 
-git clone https://github.com/mahiki/PrefectInterfaces.jl.git PrefectInterfaces
+git clone https://github.com/mahiki/PrefectInterfaces.jl PrefectInterfaces
 
 cd PrefectInterfaces/prefect
 
@@ -37,7 +37,9 @@ poetry run prefect block register --file src/blocks/secret_necromancer.py
 ```
 
 You should now be able to see the registered blocks, and settings in the Dashboard UI:
+
 http://127.0.0.1:4300/blocks
+
 http://127.0.0.1:4300/settings
 
 ```sh

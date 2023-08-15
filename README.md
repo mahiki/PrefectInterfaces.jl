@@ -15,14 +15,14 @@ PrefectInterfaces.jl helps you integrate Julia operations into a Prefect orchest
 julia> Pkg.add("https://github.com/mahiki/PrefectInterfaces.jl")
 ```
 ## USAGE
->These demo commands will work with the included prefect installation, [see Prefect installation instructions](prefect/README.md)
+These demo commands will work with the included prefect installation, [see installation reference](README.md#installation).
 
 * List available Prefect blocks
 * Load a secret from the Prefect DB
 * Load a local file system block from Prefect DB
 * Use the `read_path`, `write_path` methods from the FS Block.
     * Notice the block implements a base path
-    * *NOTE:* these are defaulting to read/read via `CSV` module. That should get fixed to handle any type of file.
+    * *NOTE:* these are defaulting to read/read via `CSV` module. That should get fixed in the future to handle any type of file.
 
 ```julia
 # provide a reference to the running Prefect REST API
@@ -86,6 +86,9 @@ df2 = fs_block.block.read_path("csv/dataset=test_block_write/data.csv")
     #    5 │ false     5.99     21  BX00     2021-05-04
     #    6 │  true     5.99    109  BX00     1984-07-04
 ```
+
+## DATASETS
+On top of the Prefect API, this package includes a **Datasets** module that reads/writes dataframes to file locations based only on the name you give to the data artifact. [See the Julia-demo document for examples](julia-demo/Julia-demo.md#dataset-type).
 
 ## CALLING FROM PREFECT FLOW
 The one thing the Julia process will need from the prefect flow is the PREFECT_API_URL. This is accessible from your Prefect application code via settings:

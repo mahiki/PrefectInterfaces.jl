@@ -1,7 +1,7 @@
-# Prefect Installation, Environment Managed by Poetry
-These are the instructions to install a local Prefect instance for package testing and demonstration. The local python environment here is managed by [poetry](https://python-poetry.org/). Prefect provides a command-line interface and python SDK.
+# Prefect Installation - Environment Managed by Poetry
+These are the instructions to install a local Prefect instance for package testing, demonstration, or even as your lightweight local workflow orchestration tool. The local python environment here is managed by [poetry](https://python-poetry.org/). Prefect provides a command-line interface and python SDK.
 
-This `./prefect` folder holds all the configuration for installing a small Prefect DB (which is a sqlite file stored in the PREFECT_HOME directory).
+This [prefect/ folder](../prefect/) holds all the configuration for installing a small Prefect DB (which is a sqlite file stored in the PREFECT_HOME directory).
 
 This lightweight installation will enable testing of the PrefectInterfaces functions and demonstrates managing an orchestration environment that can implement julia code.
 
@@ -24,11 +24,13 @@ Commands below are on macOS, should be the same on linux except for `open`.  The
 
 Open a Terminal window:
 ```sh
-brew install pipx just python@3 git tmux
+$ brew install pipx just python@3 git tmux
+
 pipx install poetry
+
 cd ~/path/to/desired/repo/location
 
-git clone https://github.com/mahiki/PrefectInterfaces.jl.git PrefectInterfaces
+git clone https://github.com/mahiki/PrefectInterfaces.jl PrefectInterfaces
 cd PrefectInterfaces/prefect
 
 # This script configures and initializes the local Prefect server.
@@ -38,7 +40,7 @@ just init
 The poetry/prefect environment should be installed now, and a prefect server running in a tmux session. You should be able to interact with it using the `prefect` CLI, remember the environment is managed by Poetry so every Prefect command needs to be prefixed: `poetry run prefect blocks ls`. The `just pre` command inserts `poetry run prefect ` for you, and all `just` commands also inject the very important `PREFECT_PROFILES_PATH` and other env variables.
 
 ```sh
-tmux ls
+$ tmux ls
 #   pi-main: 1 windows
 
 just ls
@@ -54,6 +56,14 @@ just ls
 
 # examine the contents of the two prefect blocks in the db
 just pre block inspect string/syrinx
+#                                    string/syrinx
+# ┌───────────────────────────────────────────┬──────────────────────────────────────┐
+# │ Block Type                                │ String                               │
+# │ Block id                                  │ a3de68af-c74b-40e5-9213-716b1b051dd1 │
+# ├───────────────────────────────────────────┼──────────────────────────────────────┤
+# │ value                                     │ main                                 │
+# └───────────────────────────────────────────┴──────────────────────────────────────┘
+
 just pre block inspect local-file-system/willowdata
 
 # open the tmux window, a prefect server and agent are running
