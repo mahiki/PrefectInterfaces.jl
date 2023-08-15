@@ -35,9 +35,9 @@ module PrefectInterfaces
 abstract type AbstractPrefectInterface end
 abstract type AbstractPrefectBlock <: AbstractPrefectInterface end
 
-import Base: read, write
-
-export  PrefectAPI,
+export  AbstractPrefectInterface,
+        AbstractPrefectBlock,
+        PrefectAPI,
         PrefectBlock,
         AWSCredentialsBlock,
         LocalFSBlock,
@@ -45,26 +45,19 @@ export  PrefectAPI,
         StringBlock,
         SecretString,
         CredentialPairBlock,
-        Dataset,
         ls,
         getblock,
-        makeblock,
-        read,
-        write
-
-
+        makeblock
+        
 include("config.jl")
 include("prefectblock/prefectblock.jl")
 include("prefectblock/prefectblocktypes.jl")
-include("dataset/dataset.jl")
+include("Datasets.jl")
 
-
-
-
-
-
-
-
+using   .Datasets
+export  Dataset,
+        read,
+        write
 
 
 end # PrefectInterfaces

@@ -1,5 +1,11 @@
+module Datasets
+
 using Dates, CSV, DataFrames
 using Parameters
+using PrefectInterfaces
+import Base: read, write
+
+export Dataset, read, write
 
 """
     Dataset(dataset_name=str::String; kwargs...)
@@ -159,3 +165,5 @@ end
     specific      == today   |  rundate  [rundate]
     specific      != today   |  rundate  [rundate]
 =#
+
+end # Dataset
