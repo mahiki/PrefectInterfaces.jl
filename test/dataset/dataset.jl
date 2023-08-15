@@ -1,4 +1,3 @@
-using PrefectInterfaces
 using DataFrames
 using CSV, Dates
 
@@ -21,7 +20,7 @@ ds = Dataset(dataset_name="test_julia_dataset", datastore_type="local")
     rundate_type  rundate       read     write
     ------------|------------|---------|-----------------------------------------
     latest        == today   |  latest   [latest, rundate]   default option
-    latest        != today   |  rundate  [latest]            dont write to date partition (rare)
+    latest        != today   |  latest   [latest]            dont write to date partition (rare)
     specific      == today   |  rundate  [rundate]
     specific      != today   |  rundate  [rundate]
 =#
@@ -32,35 +31,56 @@ d4 = Dataset(dataset_name="test_dataset_4", rundate_type="specific", rundate=Dat
 
 @test PrefectInterfaces.rundate_path_selector(d1) == (read = "extracts/csv/latest/dataset=test_dataset_1/data.csv", write = ["extracts/csv/latest/dataset=test_dataset_1/data.csv", "extracts/csv/dataset=test_dataset_1/rundate=$(Dates.today())/data.csv"])
 
-@test PrefectInterfaces.rundate_path_selector(d2) == (read = "extracts/csv/dataset=test_dataset_2/rundate=2020-11-03/data.csv", write = ["extracts/csv/latest/dataset=test_dataset_2/data.csv"])
+@test PrefectInterfaces.rundate_path_selector(d2) == (read = "extracts/csv/latest/dataset=test_dataset_2/data.csv", write = ["extracts/csv/latest/dataset=test_dataset_2/data.csv"])
 
 @test PrefectInterfaces.rundate_path_selector(d3) == (read = "extracts/csv/dataset=test_dataset_3/rundate=$(Dates.today())/data.csv", write = ["extracts/csv/dataset=test_dataset_3/rundate=$(Dates.today())/data.csv"])
 
 @test PrefectInterfaces.rundate_path_selector(d4) == (read = "extracts/csv/dataset=test_dataset_4/rundate=2020-11-03/data.csv", write = ["extracts/csv/dataset=test_dataset_4/rundate=2020-11-03/data.csv"])
 
-# Validate read/write from LocalFS #
-# ================================ #
-
-# data artifact path, write df to tmp block location
+# Create test dataframe from repo artifact csv #
+# ============================================ #
 artifactspath = "$PROJECT_ROOT/test/artifacts"
 test_data_key = "local-fs-block/data.csv"
 test_df = CSV.read("$artifactspath/$test_data_key", DataFrame)
 
+# Validate dataset read/write from mock LocalFSBlock #
+# ================================================== #
 # create a LocalFSBlock that uses a temp directory
 ENV["PREFECT_DATA_BLOCK_LOCAL"] = "local-file-system/working-man"
 
 tmp_basepath = mktempdir()
-test_fs_block = LocalFSBlock("local-file-system/working-man", "local-file-system", tmp_basepath)
-test_pf_block = PrefectBlock("local-file-system/working-man", test_fs_block)
-@test typeof(test_pf_block) == PrefectBlock
+mock_fs_block = LocalFSBlock("local-file-system/working-man", "local-file-system", tmp_basepath)
+mock_pf_fsblock = PrefectBlock("local-file-system/working-man", mock_fs_block)
+@test typeof(mock_pf_fsblock) == PrefectBlock
 
 
-data_path = write(ds, test_df; block=test_pf_block)
-@test isfile(data_path)
+# Dataset read/write latest/specific #
+# ================================== #
+datas = [d1, d2, d3, d4]
 
-df = read(ds; block=test_pf_block)
+paths = map(x -> write(x, test_df; block=mock_pf_fsblock), datas)
 
-@test typeof(df) == DataFrames.DataFrame
-@test nrow(df) == 6
-@test df[1, :item] == "B001"
-@test df == test_df
+for x in paths
+    @test map(isfile, x) |> all
+end
+
+# spot check
+@test paths[1] == ["$tmp_basepath/extracts/csv/latest/dataset=test_dataset_1/data.csv"
+    , "$tmp_basepath/$(d1.dataset_path)"]
+@test contains(paths[2][], "extracts/csv/latest/dataset=test_dataset_2/data.csv")
+
+# read back all datasets
+read_dfs = map(x -> read(x; block=mock_pf_fsblock), [d1, d2, d3, d4])
+
+@test map(x -> typeof(x) == DataFrame, read_dfs) |> all
+
+# Should not exist: d2 is latest, d3/d4 specific
+@test ! isfile("$tmp_basepath/$(d2.dataset_path)")
+@test ! isfile("$tmp_basepath/$(d3.latest_path)")
+@test ! isfile("$tmp_basepath/$(d4.latest_path)")
+
+# contents as expected
+@test nrow.(read_dfs) == [6,6,6,6]
+@test map(x -> x[1, :item], read_dfs) == ["B001", "B001", "B001", "B001"]
+
+@test [x == test_df for x in read_dfs] |> all

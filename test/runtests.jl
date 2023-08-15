@@ -9,8 +9,8 @@
     note:   tests run in ./test folder
 =   ===============================================================================================#
 
-using Test
 using PrefectInterfaces
+using Test
 using ConfigEnv
 using TOML
 using HTTP

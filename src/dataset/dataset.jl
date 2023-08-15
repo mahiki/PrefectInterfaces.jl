@@ -16,7 +16,16 @@ Supported keyword arguments (default show first):
     file_format ∈ ["csv"]
     rundate::Date = Datest.today()
     rundate_type ∈ ["latest", "specific"]
-    
+
+Read/write behavior depends on rundate/rundate_type combination as follows:
+
+    rundate_type|  rundate   || read    |  write
+    ------------|------------||---------|-----------------------------------------
+    latest      |  == today  || latest  |  [latest, rundate]   default option
+    latest      |  != today  || latest  |  [latest]            dont write to date partition (rare)
+    specific    |  == today  || rundate |  [rundate]
+    specific    |  != today  || rundate |  [rundate]
+
 # Examples
 ```jldoctest
 julia> begin
@@ -132,7 +141,7 @@ function rundate_path_selector(ds::Dataset)
         if ds.rundate == Dates.today()
             return (read=ds.latest_path, write=[ds.latest_path, ds.dataset_path])
         else
-            return (read=ds.dataset_path, write=[ds.latest_path])
+            return (read=ds.latest_path, write=[ds.latest_path])
         end
     else
         return (read=ds.dataset_path, write=[ds.dataset_path])
@@ -146,7 +155,7 @@ end
     rundate_type  rundate       read     write
     ------------|------------|---------|-----------------------------------------
     latest        == today   |  latest   [latest, rundate]   default option
-    latest        != today   |  rundate  [latest]            dont write to date partition (rare)
+    latest        != today   |  latest   [latest]            dont write to date partition (rare)
     specific      == today   |  rundate  [rundate]
     specific      != today   |  rundate  [rundate]
 =#
