@@ -52,7 +52,7 @@ export  AbstractPrefectInterface,
 include("config.jl")
 include("prefectblock/prefectblock.jl")
 include("prefectblock/prefectblocktypes.jl")
-include("Datasets.jl")
+include("Datasets/Datasets.jl")
 
 using   .Datasets
 export  Dataset,
