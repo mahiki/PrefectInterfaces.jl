@@ -6,6 +6,7 @@ using PrefectInterfaces
 import Base: read, write
 
 export Dataset, read, write
+include("config.jl")
 
 """
     Dataset(dataset_name=str::String; kwargs...)
