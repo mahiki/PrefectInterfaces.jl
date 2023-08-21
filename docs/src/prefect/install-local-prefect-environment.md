@@ -1,15 +1,17 @@
-# Prefect Installation - Environment Managed by Poetry
+# Prefect Installation
+This local install environment is managed by Poetry, ensuring isolation from the 
 These are the instructions to install a local Prefect instance for package testing, demonstration, or even as your lightweight local workflow orchestration tool. The local python environment here is managed by [poetry](https://python-poetry.org/). Prefect provides a command-line interface and python SDK.
 
-This [prefect/ folder](../prefect/) holds all the configuration for installing a small Prefect DB (which is a sqlite file stored in the PREFECT_HOME directory).
+This [`prefect/` folder](https://github.com/mahiki/PrefectInterfaces.jl/tree/main/prefect) holds all the configuration for installing a small Prefect DB (which is a sqlite file stored in the PREFECT_HOME directory).
 
 This lightweight installation will enable testing of the PrefectInterfaces functions and demonstrates managing an orchestration environment that can implement julia code.
 
-## JUSTFILE
+## Justfile
 We use [justfile](https://just.systems/). It is convenient to manage development tasks like starting/stopping the server with a task runner of some sort. The just commands inject the necessary environment variables (from `.env`) and provides a self-documenting scripting tool.
 
-There are some non-`just` [example commands in this file.](setup-without-justfile.md)
-## INSTALL PREFECT (macOS)
+There are some non-`just` commands in the section [Install Prefect Environment - Poetry Commands](@ref).
+
+## Install Prefect (Macos)
 If you don't already have a Prefect Server or Cloud instance running, you'll need to install one locally to test out the Julia **PrefectInterfaces** functionality.
 
 This prefect installation requires:
@@ -84,42 +86,4 @@ just use main
 just kill
 ```
 
-**Next Steps:** [Julia demo of PrefectInterfaces](../julia-demo/Julia-demo.md)
-
-----------
-## DEVELOP / TEST
-```sh
-julia --project=. --startup-file=no --eval 'import Pkg; Pkg.test()'
-# SERVER HEALTH CHECK #
-# =================== #
-[ Info: Prefect Server must be running (`prefect server start`)
-Active Prefect Environment: main
-Calling http://127.0.0.1:4300/api/health
-Server reponse status: 200 OK
-
-# BEGIN UNIT TESTS #
-# ================ #
-
-Test Summary:                 | Pass  Total  Time
-All tests                     |   86     86  2.5s
-  Config                      |    9      9  0.4s
-  Block types, function tests |   58     58  1.8s
-  Dataset function            |   19     19  0.3s
-
-     Testing PrefectInterfaces tests passed
-```
-
-Alternately, using the `justfile`
-```sh
-cd .../PrefectInterfaces
-
-just test
-```
-
-Or, from the REPL:
-
-`julia --project=.`
-```jl
-pkg> activate .
-pkg> test
-```
+**Next Steps:** [Julia Demo](@ref)

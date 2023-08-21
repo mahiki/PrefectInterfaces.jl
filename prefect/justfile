@@ -33,6 +33,10 @@ run *args:
 pre *args:
   poetry run prefect {{args}}
 
+# python command in poetry environment
+py *args:
+  poetry run python {{args}}
+
 # switch prefect profile [main | dev] to current or specified branch
 use *branch=use_branch:
   -poetry run prefect profile use {{branch}}

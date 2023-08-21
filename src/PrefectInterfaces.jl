@@ -7,7 +7,7 @@ PrefectInterfaces.jl provides composite types to enable:
 Use of this package requires a running Prefect server to make connections to the Prefect server REST API, configured with the environment variable `PREFECT_API_URL` or by specifying the endpoint url in constructor calls. Calling `PrefectBlock(blockname::String)` retrieves Prefect block information by name, and thus julia modules can be built to connect to resources defined by those blocks.
 
 # Examples
-```jldoctest
+```julia
 julia> using PrefectInterfaces
 julia> ENV["PREFECT_API_URL"] = "http://127.0.0.1:4300/api";
 

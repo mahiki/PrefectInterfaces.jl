@@ -1,5 +1,5 @@
 # Install Prefect Environment - Poetry Commands
-This is the same as the [Install section of prefect](README.md#install-prefect-macos), without using the `justfile` taskrunner. It makes the relationship between env variables and Prefect DB location and API more explicit.
+This is the same as the [Prefect Installation](@ref), without using the `justfile` taskrunner. It makes the relationship between env variables and Prefect DB location and API more explicit.
 
 ```sh
 brew install pipx just python@3

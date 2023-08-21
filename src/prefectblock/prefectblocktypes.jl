@@ -15,6 +15,8 @@ A struct for storing secret values with overrides of `show` and `dump` to preven
 
 # Example:
 ```jldoctest
+julia> using PrefectInterfaces
+
 julia> password = SecretString("abcd1234")
 ####Secret####
 
@@ -48,7 +50,7 @@ Corresponds with the Prefect LocalFileSystem block. Attached functions:
 Returns or writes a DataFrame file at "LocalFSBlock.basepath/path/to/file.csv".
 
 # Examples:
-```jldoctest
+```julia
 julia> fsblock = PrefectBlock("local-file-system/willowdata");
 
 julia> df = fsblock.block.read_path("extracts/csv/dataset=test_table/rundate=2023-05-25/data.csv")

@@ -1,7 +1,9 @@
 import os
+from os.path import dirname
 from dotenv import load_dotenv
 
 print(f"cwd: {os.getcwd()}")
+PYTHON_PROJECT_ROOT = dirname(dirname(os.path.abspath(__file__)))
 
 load_dotenv(dotenv_path="../.env", override=False)
 

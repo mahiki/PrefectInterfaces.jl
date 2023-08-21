@@ -1,4 +1,6 @@
-# Data Scientist User Story, and Design Explanation
+# Usage and Design Explanation
+>A Data Scientist or Analyst User Story
+
 The problem is to manage routine data ETL or pipeline processing with Prefect and the Python API, while calling Julia fuctions for expressive dataframe transformations or niche high performance custom code. Prefect doesn't provide a Julia SDK (yet), so this package provides components for julia operations that are called from a Prefect orchestration environment. 
 
 Prefect python flows will call Julia `DockerContainer` or `ShellOperations` with parameters such as `{dataset_name: "my_great_dataset", datastore_type: "remote"}`. This isolates the julia environment from the Python one, and avoids sending large data objects through function calls to/from Prefect flows.
@@ -13,12 +15,12 @@ So now we can orchestrate simple SQL query extracts and data pipelines using the
 └─────────────┘                   └─────────────┘                   └───────────┘
 ```
 
-## WHO WOULD WANT THIS?
+## Who Would Want This?
 The use-case is for scientists or analysts who use Julia and orchestrate data tasks with Prefect. Science and analyst workflows are multi-stage affairs and orchestration is the best solution to managing a proliferation of scheduled jobs. Crucially, the researcher doesn't need or want to set up a production data engineering platform (DBT, Snowflake, Databricks, Azure Data Lake, etc.); this package imagines a very lightweight coder experience. Prefect flows in python are easily understood and quickly deployed (even just locally), and very usable at the individual adhoc level all the way up to large team production environment.
 
 Ultimately, you will desire to deploy some elegant julia process into a production environment, this package can help achieve this via the design considered above.
 
-## DATASET
+## Dataset
 This is a concrete example of code defined in your Prefect python application that would need a parallel defition in your julia application.
 This composite type holds metadata that represents where a data artifact would be written to or read from, and allows a data product to be referenced by a `dataset_name`. The `Dataset` keeps track of file paths and partitions (`rundate`). Other partitions could be implemented, even a Spark/Apache Hive compliant design, if you are a data engineer that likes julia.
 
@@ -39,17 +41,17 @@ $HOME/willowdata/projectname/dev/extracts
 
 As a data scientist, it is convenient to reference copious adhoc data artificts by name and let a lightweight orchestration application figure out where to keep it.
 
-## PACKAGE DETAILS
+## Package Details
 * Interacts with the Prefect Server API to get block information for read/writes, credentials, filesystems, etc.
 * The `PrefectBlock(blockname::String)` function requires that a Prefect Server is running, and server endpoint is provided via env variable `PREFECT_API_URL` or a url as keyword argument.
 * A good way is to use the `.env` file to specify configuration such as local/remote with a call to `ConfigEnv.dotenv()`
 
-## DEVELOPMENT AND PRODUCTION ENVIRONMENTS
+## Development And Production Environments
 Prefect profiles are good for separating `prod/dev/test` environments, for convenience from the Prefect CLI. Ultimately the API URL defines which Prefect environment you are in. It's useful for these to correspond to git branches. 
 
 The julia environment does not need to be aware of project environment, because it will pull all required information from blocks accessed via each environment's PREFECT_API_URL. For example, in the Prod environment an S3 bucket key "willowdata/prod" would be defined in the `s3-bucket` block. The julia application pulls the s3 bucket and key from block information and otherwise executes in the same way for each environment.
 
 **Managing dev/prod environment with dev/main git branches:** When both main/dev are local, there will be two local prefect DB with different PREFECT_API_URL defined by the Prefect `profiles.toml` profile. The python side of the application will need to distinguish the dev/prod PREFECT_HOME environment variables to define different locations for the prefect DB (which is just a sqlite file). I prefer to do this in a task runner outside of the python application, something like Github Actions, Make, or `just`.
 
-## JUSTFILE
+## Justfile
 I've found when managing a Prefect orchestrator it is helpful to have a taskrunner program that documents development tasks and executes them for you as well. I use [`just`](https://just.systems/) to launch `dev/main` Prefect DB local servers and manage tasks like Prefect deployment builds ßand running tests before merging and deploying. If you, like most data scientists, like to develop and test on the main branch please ignore this part of the package.

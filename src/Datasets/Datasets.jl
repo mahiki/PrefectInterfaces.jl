@@ -34,7 +34,7 @@ Read/write behavior depends on rundate/rundate_type combination as follows:
     specific    |  != today  || rundate |  [rundate]
 
 # Examples
-```jldoctest
+```julia
 julia> begin
     ENV["PREFECT_DATA_BLOCK_LOCAL"] = "local-file-system/willowdata"
     ENV["PREFECT_API_URL"] = "http://127.0.0.1:4300/api"
@@ -91,7 +91,7 @@ Returns a `DataFrame` by calling `CSV.read` on a filepath defined by the Dataset
 *NOTE:* A prefect server must be available.
 
 # Examples
-```jldoctest
+```julia
 julia> begin
     ENV["PREFECT_API_URL"] = "http://127.0.0.1:4300/api"
     ENV["PREFECT_DATA_BLOCK_LOCAL"] = "local-file-system/willowdata"

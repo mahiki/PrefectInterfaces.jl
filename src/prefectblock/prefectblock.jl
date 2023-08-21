@@ -8,25 +8,34 @@ Constructors:
 
     PrefectBlock(blockname::String)
     PrefectBlock(blockname::String, api_url::String)
+    PrefectBlock(blockname::String, block::AbstractPrefectBlock)
 
 Returns a Prefect Block from the Prefect server, the block data is stored in the `block` field. Prefect Block names are strings called 'slugs', formatted as `block-type-name/block-name`.
 A Prefect Block is uniquely specified by its name and the Prefect DB where it is stored, therefore the API URL is necessary for the constructor.
+
+A non-server block can be constructed by supplying an AbstractPrefectBlock object.
 
 The AbstractPrefectBlock types are meant to mirror the functionality defined in the Prefect Python API, for example `LocalFSBlock` has a `write_path()` method attached which only writes to paths relative from the block basepath.
 
 # Examples:
 ```jldoctest
-julia> fsblock = PrefectBlock("local-file-system/willowdata");
+julia> using PrefectInterfaces
 
-julia> dump(fs)
+julia> spec_fsblock = LocalFSBlock("local-file-system/xanadu", "local-file-system", "/usr/mahiki/xanadu/dev");
+
+julia> fsblock = PrefectBlock("local-file-system/xanadu", spec_fsblock);
+
+julia> dump(fsblock)
 PrefectBlock
-  blockname: String "local-file-system/willowdata"
+  blockname: String "local-file-system/xanadu"
   block: LocalFSBlock
-    blockname: String "local-file-system/willowdata"
+    blockname: String "local-file-system/xanadu"
     blocktype: String "local-file-system"
-    basepath: String "/Users/mahiki/willowdata/dev"
-    read_path: #4 (function of type PrefectInterfaces.var"#4#5"{String})
-      basepath: String "/Users/mahiki/willowdata/dev"
+    basepath: String "/usr/mahiki/xanadu/dev"
+    read_path: #4 (function of type PrefectInterfaces.var"#4#6"{String})
+      basepath: String "/usr/mahiki/xanadu/dev"
+    write_path: #5 (function of type PrefectInterfaces.var"#5#7"{String})
+      basepath: String "/usr/mahiki/xanadu/dev"
 ```
 """
 struct PrefectBlock <: AbstractPrefectBlock
@@ -54,7 +63,7 @@ end
 Calls the Prefect server and returns a list of all defined blocks as Vector{String}. Default is to list all blocks, later implementation could include "flows", "deployments", "work-pool" etc.
 
 # Examples:
-```jldoctest
+```julia
 julia> ENV["PREFECT_API_URL"] = "http://127.0.0.1:4300/api";
 
 julia> ls()

@@ -5,13 +5,15 @@ Mutable struct tha stores the Prefect server api endpoint. All `PrefectInterface
 
 # Examples:
 ```jldoctest
-julia> ENV["PREFECT_API_URL"] = "http://127.0.0.1:4200/api";
+julia> using PrefectInterfaces
+
+julia> ENV["PREFECT_API_URL"] = "http://127.0.0.1:4300/api";
 
 julia> api = PrefectAPI()
-PrefectAPI("http://127.0.0.1:4200/api")
+PrefectAPI("http://127.0.0.1:4300/api")
 
 julia> api.url
-"http://127.0.0.1:4200/api"
+"http://127.0.0.1:4300/api"
 
 julia> api.url = "http://127.0.0.1:4333/api"
 "http://127.0.0.1:4333/api"
