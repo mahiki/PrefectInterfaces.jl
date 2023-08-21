@@ -8,22 +8,27 @@ You prefer to analyze and wrangle data in Julia, and you orchestrate your data w
 Included in the package is a bootstrapped installation of a local Prefect instance, and an example `Dataset` type to demonstrate a concrete use-case.
 
 ## Installation
-* A Prefect server/cloud instance must be available via API URL to use these functions.
-* See [Prefect Installation](@ref).
+!!! note "Requires a Prefect Instance"
+    To use most functionality, a Prefect server/cloud instance must be available. Provide the API endpoint via environment variable `PREFECT_API_URL` or set the definition within julia application code.
+
+    See [Prefect Installation](@ref) to quickly launch a local Prefect server.
 
 ```julia
-# Package is not yet registered
+# Package registration is pending
 julia> Pkg.add("https://github.com/mahiki/PrefectInterfaces.jl")
+
+# After 2023-08-24
+julia> Pkg.add("PrefectInterfaces")
 ```
 ## Usage
-These demo commands will work with the included prefect installation.
-
 * List available Prefect blocks
 * Load a secret from the Prefect DB
 * Load a local file system block from Prefect DB
 * Use the `read_path`, `write_path` methods from the FS Block.
     * Notice the block implements a base path
-    * *NOTE:* these are defaulting to read/read via `CSV` module. That should get fixed in the future to handle any type of file.
+
+!!! note "Read/Write Assumes CSV Data"
+    `read_path/write_path`, and also the `Dataset` read/write methods, currently support read/read via `CSV` module. In the future this should be refactored to handle any type of file.
 
 ```julia
 # provide a reference to the running Prefect REST API
@@ -92,9 +97,10 @@ df2 = fs_block.block.read_path("csv/dataset=test_block_write/data.csv")
 On top of the Prefect API, this package includes a **Datasets** module that reads/writes dataframes to file locations based only on the name you give to the data artifact, see [Dataset Type](@ref).
 
 ## Calling From Prefect Flow
-The one thing the Julia process will need from the prefect flow is the PREFECT_API_URL. This is accessible from your Prefect application code via settings:
+The one thing the Julia process will need from the prefect flow is the PREFECT_API_URL. This is accessible from your Prefect python application code via settings. The call to Julia code is via `ShellOperation` or Docker container.
 
 ```py
+# Python
 from prefect import flow
 from prefect_shell import ShellOperation
 from prefect import settings

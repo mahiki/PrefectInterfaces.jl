@@ -1,6 +1,33 @@
 # Developers
-Develop and test with 
+* Develop and test without/with just taskrunner.
+* Documenter.jl `doctest()` included in `runtests.jl`
 
+## Test, Build Docs with Justfile
+!!! note "Note"
+    Assumes local Prefect test db was installed, see [Prefect Installation](@ref).
+
+```bash
+$ cd ./PrefectInterfaces
+
+$ just build
+
+Test Summary:                 | Pass  Total  Time
+All tests                     |   95     95  9.0s
+  Config                      |    9      9  0.4s
+  Block types, function tests |   58     58  1.8s
+  Dataset function            |   27     27  0.5s
+  Doctests: PrefectInterfaces |    1      1  5.8s
+
+     Testing PrefectInterfaces tests passed
+
+# docs only: build/doctest
+just docs
+
+# review the docs locally
+open ./docs/build/index.html
+```
+
+## Run Tests from Command Line
 ```bash
 # launch the local prefect server if its not available
 cd ./prefect
@@ -24,16 +51,9 @@ All tests                     |   94     94  2.7s
      Testing PrefectInterfaces tests passed
 ```
 
-Alternately, using the `justfile`
-```julia
-cd .../PrefectInterfaces
+## REPL
+`$ julia --project=.`
 
-just test
-```
-
-Or, from the REPL:
-
-`julia --project=.`
 ```julia
 pkg> activate .
 pkg> test

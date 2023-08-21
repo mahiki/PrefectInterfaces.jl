@@ -17,15 +17,16 @@ julia:
   julia --project=. --startup-file=no
 
 # activate julia package and initiate test/runtests.jl in test environment
-test: && bump
+test:
   -julia --project=. --startup-file=no --eval 'import Pkg; Pkg.test()'
 
 # workflow reminders when tests are done
-bump:
-  @echo
-  @echo "Before tagging remember to update the SemVer version number in Project.toml"
-  @echo "NEXT:"
-  @echo "    update version"
-  @echo "    commit changes"
-  @echo "    tag commit and push"
-  @echo "    just kill (the server)"
+docs:
+  @echo "Building docs"
+  julia --startup-file=no --project=docs --color=yes docs/make.jl
+  open ./docs/build/index.html
+
+launch:
+  just --justfile=prefect/justfile launch
+
+build: launch test docs

@@ -30,3 +30,6 @@ prefect.db-shm
 prefect.db-wal
 
 !test/artifacts/**/*.csv
+
+# Documenter build needs local package definition
+!docs/Manifest.toml

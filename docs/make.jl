@@ -1,8 +1,6 @@
 using PrefectInterfaces
 using Documenter
 
-push!(LOAD_PATH,"../src/")
-
 DocMeta.setdocmeta!(PrefectInterfaces, :DocTestSetup, :(using PrefectInterfaces); recursive=true)
 
 makedocs(;
@@ -24,9 +22,7 @@ makedocs(;
             "Prefect Install" => "prefect/install-local-prefect-environment.md"
             , "Manual Install" => "prefect/setup-without-justfile.md"
             ]
-        , "API" => [
-            "Exported Names" => "lib/autodoc.md"
-            ]
+        , "API" =>  "lib/autodoc.md"
         , "Developers" => "developers.md"
     ]
 

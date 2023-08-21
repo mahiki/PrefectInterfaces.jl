@@ -31,11 +31,17 @@ pkg> instantiate
 # back to julia prompt
 julia> using PrefectInterfaces
 
+# returns the default from env
 PrefectAPI().url
     # "http://127.0.0.1:4300/api"
 
 PrefectAPI("http://127.0.0.1:4444/api").url
     # "http://127.0.0.1:4444/api"
+
+# PrefectAPI is called by various functions to retreive the current API env value
+ENV["PREFECT_API_URL"] = "http://127.0.0.1:4301/api";
+PrefectAPI().url
+    # "http://127.0.0.1:4301/api"
 
 # Construct an example, normally this is pulled from DB if such a block 
 #   exists with PrefectBlock("aws-credentials/subdivisions")
@@ -174,7 +180,8 @@ The datastore now looks like this:
 
 ----------
 ## Environment
-*A note about ENV*: The Prefect types pull information from a running Prefect DB, by calling the REST API stored in PREFECT_API_URL. If the julia REPL session is called from a `just` command, the .env variables will be exported into the environment. In application code you need to either set `ENV["PREFECT_API_URL"]="http://127.0.0.1:4300/api"` (for example) or use the `ConfigEnv` package as shown below to load the `.env` file from the Julia application.
+!!! note "A Note about ENV"
+    The Prefect types pull information from a running Prefect DB, by calling the REST API stored in PREFECT_API_URL. If the julia REPL session is called from a `just` command, the .env variables will be exported into the environment. In application code you need to either set `ENV["PREFECT_API_URL"]="http://127.0.0.1:4300/api"` (for example) or use the `ConfigEnv` package as shown below to load the `.env` file from the Julia application.
 
 The `Dataset` read/write functions depend on the local and remote data block names being defined in environment variables.
 
