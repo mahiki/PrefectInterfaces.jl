@@ -28,3 +28,4 @@ bump:
   @echo "    update version"
   @echo "    commit changes"
   @echo "    tag commit and push"
+  @echo "    just kill (the server)"
