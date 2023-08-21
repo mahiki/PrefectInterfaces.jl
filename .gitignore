@@ -28,3 +28,5 @@ memo_store.toml
 prefect.db
 prefect.db-shm
 prefect.db-wal
+
+!test/artifacts/**/*.csv
