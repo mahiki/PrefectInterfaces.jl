@@ -1,14 +1,7 @@
-# TODO
-TODO: write_path/read_path should file write, composable CSV.write function as sink
-TODO: read/write remote s3 bucket
-TODO: Dataset should support arbitrary partitions beyond `rundate`, pass a vector of names maybe.
+# DONE
+>2023-08-21: [Managing TODOs with issues on the repo](https://github.com/mahiki/PrefectInterfaces.jl/issues)
+
 ----------
-TODO: [ldoctests can work with mocked FSBLock](../src/Datasets/Datasets.jl)
-TODO: add datafile for doctests with "If you can select this table you…  PASSED"
-TODO: [user stories](../todo/user-stories.md)
-
-
-
 DONE: split Dataset into new sub module. Not the same.
 DONE: dataset tests, more detail on split paths. file exist on expected paths
 DONE: redo all tests, can initialize prefect or just create blocks by constructor.
