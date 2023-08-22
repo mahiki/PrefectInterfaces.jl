@@ -19,7 +19,8 @@ export PREFECT_PROFILES_PATH="./profiles.toml"
 poetry run prefect server start
 ```
 
-Notice a nice dashboard should be available locally on a browser here: http://127.0.0.1:4300
+!!! note "Dashboard Local URL"
+    A nice dashboard should be available locally on a browser here: http://127.0.0.1:4300
 
 Now initialize the Prefect environment by registering some Blocks. We can establish a "main" and "dev" environment by starting another prefect server at a different `PREFECT_SERVER_API_PORT` and `PREFECT_HOME`.
 

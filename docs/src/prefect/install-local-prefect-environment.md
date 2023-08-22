@@ -1,26 +1,23 @@
 # Prefect Installation
-This local install environment is managed by Poetry, ensuring isolation from the 
-These are the instructions to install a local Prefect instance for package testing, demonstration, or even as your lightweight local workflow orchestration tool. The local python environment here is managed by [poetry](https://python-poetry.org/). Prefect provides a command-line interface and python SDK.
+This local install environment is managed by [Poetry](https://python-poetry.org/), ensuring isolation from other python environments.
+These are the instructions to install a local Prefect instance for package testing, demonstration, or even as a lightweight local workflow orchestration tool. [Prefect](https://docs.prefect.io) provides a command-line interface and python SDK.
 
 This [`prefect/` folder](https://github.com/mahiki/PrefectInterfaces.jl/tree/main/prefect) holds all the configuration for installing a small Prefect DB (which is a sqlite file stored in the PREFECT_HOME directory).
-
-This lightweight installation will enable testing of the PrefectInterfaces functions and demonstrates managing an orchestration environment that can implement julia code.
 
 ## Justfile
 We use [justfile](https://just.systems/). It is convenient to manage development tasks like starting/stopping the server with a task runner of some sort. The just commands inject the necessary environment variables (from `.env`) and provides a self-documenting scripting tool.
 
-There are some non-`just` commands in the section [Install Prefect Environment - Poetry Commands](@ref).
+Find paralled installation instructions that eschew `just` in [Install Prefect Environment - Poetry Commands](@ref).
 
 ## Install Prefect (Macos)
 If you don't already have a Prefect Server or Cloud instance running, you'll need to install one locally to test out the Julia **PrefectInterfaces** functionality.
 
-This prefect installation requires:
-
-    pipx    (to install poetry)
-    python3
-    tmux
-    git
-    poetry
+!!! note "Prefect Install Dependencies
+    * pipx, to install poetry
+    * python3
+    * tmux
+    * git
+    * poetry
 
 Commands below are on macOS, should be the same on linux except for `open`.  The dependency installation will be different depending on your linux distribution.
 
@@ -30,16 +27,15 @@ $ brew install pipx just python@3 git tmux
 
 pipx install poetry
 
-cd ~/path/to/desired/repo/location
-
 git clone https://github.com/mahiki/PrefectInterfaces.jl PrefectInterfaces
+
 cd PrefectInterfaces/prefect
 
 # This script configures and initializes the local Prefect server.
 just init
 ```
 
-The poetry/prefect environment should be installed now, and a prefect server running in a tmux session. You should be able to interact with it using the `prefect` CLI, remember the environment is managed by Poetry so every Prefect command needs to be prefixed: `poetry run prefect blocks ls`. The `just pre` command inserts `poetry run prefect ` for you, and all `just` commands also inject the very important `PREFECT_PROFILES_PATH` and other env variables.
+The poetry/prefect environment should be installed now, and a prefect server running in a tmux session. You should be able to interact with it using the `prefect` CLI, the python API, or the Julia commands in the [Julia Demo](@ref) section.  Remember the environment is managed by Poetry so every CLI Prefect command needs to be prefixed: `poetry run prefect blocks ls`. The `just pre` command inserts `poetry run prefect ` for you, and all `just` commands also inject the very important `PREFECT_PROFILES_PATH` and other env variables.
 
 ```sh
 $ tmux ls
@@ -73,9 +69,6 @@ just view main
 
 # exit tmux with CTRL-b, d
 
-# The prefect UI should be observable in a browser here
-open http://127.0.0.1:4300/blocks
-
 # examine the env variables injected by just commands
 just env
 
@@ -86,4 +79,9 @@ just use main
 just kill
 ```
 
+!!! note "Dashboard Local URL"
+    A nice dashboard should be available locally on a browser here: http://127.0.0.1:4300
+
+
+----------
 **Next Steps:** [Julia Demo](@ref)

@@ -29,4 +29,7 @@ docs:
 launch:
   just --justfile=prefect/justfile launch
 
-build: launch test docs
+kill:
+  just --justfile=prefect/justfile kill
+
+build: launch test docs kill

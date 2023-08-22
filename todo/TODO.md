@@ -4,6 +4,7 @@ TODO: read/write remote s3 bucket
 TODO: Dataset should support arbitrary partitions beyond `rundate`, pass a vector of names maybe.
 ----------
 TODO: [ldoctests can work with mocked FSBLock](../src/Datasets/Datasets.jl)
+TODO: add datafile for doctests with "If you can select this table you…  PASSED"
 TODO: [user stories](../todo/user-stories.md)
 
 

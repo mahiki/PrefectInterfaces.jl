@@ -1,10 +1,10 @@
 # Developers
-* Develop and test without/with just taskrunner.
+* Develop and test with/without `just` taskrunner.
 * Documenter.jl `doctest()` included in `runtests.jl`
 
 ## Test, Build Docs with Justfile
 !!! note "Note"
-    Assumes local Prefect test db was installed, see [Prefect Installation](@ref).
+    Assumes local Prefect test db was installed and running, see [Prefect Installation](@ref).
 
 ```bash
 $ cd ./PrefectInterfaces

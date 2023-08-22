@@ -23,20 +23,11 @@ $ just julia
 * Access the secret string in an AWS Credentials block via `.secret` field
   
 ```julia
-# julia> go into Pkg mode
-] status
-pkg> add https://github.com/mahiki/PrefectInterfaces.jl
-pkg> instantiate
-
-# back to julia prompt
 julia> using PrefectInterfaces
 
-# returns the default from env
+# returns the current endpoint from env
 PrefectAPI().url
     # "http://127.0.0.1:4300/api"
-
-PrefectAPI("http://127.0.0.1:4444/api").url
-    # "http://127.0.0.1:4444/api"
 
 # PrefectAPI is called by various functions to retreive the current API env value
 ENV["PREFECT_API_URL"] = "http://127.0.0.1:4301/api";
@@ -51,13 +42,13 @@ creds = AWSCredentialsBlock(
     , "us-west-2"
     , "AKIAXXX999XXX999"
     , "GUUxx87987xxPXH")
-AWSCredentialsBlock("aws-credentials/subdivisions", "aws-credentials", "us-west-2", "AKIAXXX999XXX999", ####Secret####)
+    # AWSCredentialsBlock("aws-credentials/subdivisions", "aws-credentials", "us-west-2", "AKIAXXX999XXX999", ####Secret####)
 
 creds.aws_secret_access_key
-####Secret####
+    # ####Secret####
 
 creds.aws_secret_access_key.secret
-"GUUxx87987xxPXH"
+    # "GUUxx87987xxPXH"
 ```
 The secret is obfuscated, to prevent it being visible in logs. 
 

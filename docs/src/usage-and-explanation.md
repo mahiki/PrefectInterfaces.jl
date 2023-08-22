@@ -16,9 +16,9 @@ So now we can orchestrate simple SQL query extracts and data pipelines using the
 ```
 
 ## Who Would Want This?
-The use-case is for scientists or analysts who use Julia and orchestrate data tasks with Prefect. Science and analyst workflows are multi-stage affairs and orchestration is the best solution to managing a proliferation of scheduled jobs. Crucially, the researcher doesn't need or want to set up a production data engineering platform (DBT, Snowflake, Databricks, Azure Data Lake, etc.); this package imagines a very lightweight coder experience. Prefect flows in python are easily understood and quickly deployed (even just locally), and very usable at the individual adhoc level all the way up to large team production environment.
+One who wants deploy some julia process into a production environment orchestrated by Prefect.
 
-Ultimately, you will desire to deploy some elegant julia process into a production environment, this package can help achieve this via the design considered above.
+The use-case is for scientists or analysts who use Julia and orchestrate data tasks with Prefect. Science and analyst workflows are multi-stage affairs and orchestration is the best solution to managing a proliferation of scheduled jobs. Crucially, the researcher doesn't need or want to set up a production data engineering platform (DBT, Snowflake, Databricks, Azure Data Lake, etc.); this package imagines a very lightweight coder experience. Prefect flows in python are easily understood and quickly deployed (even just locally), and very usable at the individual adhoc level all the way up to large team production environment.
 
 ## Dataset
 This is a concrete example of code defined in your Prefect python application that would need a parallel defition in your julia application.
