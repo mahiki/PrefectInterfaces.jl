@@ -7,12 +7,11 @@ This is a small package that helps you connect to a Prefect instance from a Juli
 
 ## Installation
 ```julia
-# Package registration pending
-julia> Pkg.add("https://github.com/mahiki/PrefectInterfaces.jl")
+julia> Pkg.add("PrefectInterfaces")
 ```
 
 ## Usage
-* A Prefect server/cloud instance must be available via API URL to use these functions, the examples below are hypothetical.
+* A Prefect server/cloud instance must be available via API URL to use these functions, the examples below are hypothetical and require a running Prefect server with blocks registered in the names below.
 * See [Prefect local installation instructions.](docs/src/prefect/install-local-prefect-environment.md)
 
 ```julia

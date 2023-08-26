@@ -1,5 +1,5 @@
-using PrefectInterfaces
 using Documenter
+using PrefectInterfaces
 
 DocMeta.setdocmeta!(PrefectInterfaces, :DocTestSetup, :(using PrefectInterfaces); recursive=true)
 

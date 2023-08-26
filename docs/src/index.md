@@ -14,10 +14,6 @@ Included in the package is a bootstrapped installation of a local Prefect instan
     See [Prefect Installation](@ref) to quickly launch a local Prefect server.
 
 ```julia
-# Package registration is pending
-julia> Pkg.add("https://github.com/mahiki/PrefectInterfaces.jl")
-
-# After 2023-08-24
 julia> Pkg.add("PrefectInterfaces")
 ```
 ## Usage
