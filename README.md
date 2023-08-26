@@ -1,5 +1,5 @@
 # PrefectInterfaces.jl 
-[![Stable](https://img.shields.io/badge/docs-main-blue.svg)](https://mahiki.github.io/PrefectInterfaces.jl) [![Build Status](https://github.com/mahiki/PrefectInterfaces.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/mahiki/PrefectInterfaces.jl/actions/workflows/CI.yml?query=branch%3Amain) [![Coverage](https://codecov.io/gh/mahiki/PrefectInterfaces.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/mahiki/PrefectInterfaces.jl)
+[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://mahiki.github.io/PrefectInterfaces.jl) [![Build Status](https://github.com/mahiki/PrefectInterfaces.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/mahiki/PrefectInterfaces.jl/actions/workflows/CI.yml?query=branch%3Amain) [![Coverage](https://codecov.io/gh/mahiki/PrefectInterfaces.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/mahiki/PrefectInterfaces.jl)
 
 >May the official Prefect Julia SDK arrive soon.
 
