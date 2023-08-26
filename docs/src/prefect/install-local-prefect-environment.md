@@ -35,7 +35,7 @@ cd PrefectInterfaces/prefect
 just init
 ```
 
-The poetry/prefect environment should be installed now, and a prefect server running in a tmux session. You should be able to interact with it using the `prefect` CLI, the python API, or the Julia commands in the [Julia Demo](@ref) section.  Remember the environment is managed by Poetry so every CLI Prefect command needs to be prefixed: `poetry run prefect blocks ls`. The `just pre` command inserts `poetry run prefect ` for you, and all `just` commands also inject the very important `PREFECT_PROFILES_PATH` and other env variables.
+The poetry/prefect environment should be installed now, and a prefect server running in a tmux session. You should be able to interact with it using the `prefect` CLI, the python API, or the Julia commands in the [Julia Demo on REPL](@ref) section.  Remember the environment is managed by Poetry so every CLI Prefect command needs to be prefixed: `poetry run prefect blocks ls`. The `just pre` command inserts `poetry run prefect ` for you, and all `just` commands also inject the very important `PREFECT_PROFILES_PATH` and other env variables.
 
 ```sh
 $ tmux ls
@@ -84,4 +84,4 @@ just kill
 
 
 ----------
-**Next Steps:** [Julia Demo](@ref)
+**Next Steps:** [Julia Demo on REPL](@ref)

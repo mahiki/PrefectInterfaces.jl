@@ -1,4 +1,4 @@
-# Julia Demo
+# Julia Demo on REPL
 This demonstrates interacting with a running Prefect DB from the Julia REPL. If you don't have a Prefect Server instance running, see the [Prefect Installation](@ref) doc first. Block information is usually pulled from the Prefect DB, but Prefect Block types can also be manually created from the constructors.
 
 See files in the `test` folder for examples of Block usage and loading data from Prefect DB, some require the Prefect DB to run and some tests simply construct dummy objects without connecting to Prefect.

@@ -16,7 +16,10 @@ makedocs(;
     ),
     pages=[
         "Introduction" => "index.md"
-        , "Demonstration" => "julia-demo.md"
+        , "Demonstration" => [
+            "Julia REPL" => "julia-demo.md"
+            , "Prefect Python" => "call-julia-from-prefect-flow.md"
+            ]
         , "Detailed Explanation" => "usage-and-explanation.md"
         , "Prefect" => [
             "Prefect Install" => "prefect/install-local-prefect-environment.md"
