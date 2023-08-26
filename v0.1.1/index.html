@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Introduction · PrefectInterfaces.jl</title><script data-outdated-warner src="assets/warner.js"></script><link rel="canonical" href="https://mahiki.github.io/PrefectInterfaces.jl/"/><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.045/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.24/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="assets/documenter.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href>PrefectInterfaces.jl</a></span></div><form class="docs-search" action="search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li class="is-active"><a class="tocitem" href>Introduction</a><ul class="internal"><li><a class="tocitem" href="#Installation"><span>Installation</span></a></li><li><a class="tocitem" href="#Usage"><span>Usage</span></a></li><li><a class="tocitem" href="#Datasets"><span>Datasets</span></a></li><li><a class="tocitem" href="#Calling-From-Prefect-Flow"><span>Calling From Prefect Flow</span></a></li></ul></li><li><a class="tocitem" href="julia-demo/">Demonstration</a></li><li><a class="tocitem" href="usage-and-explanation/">Detailed Explanation</a></li><li><span class="tocitem">Prefect</span><ul><li><a class="tocitem" href="prefect/install-local-prefect-environment/">Prefect Install</a></li><li><a class="tocitem" href="prefect/setup-without-justfile/">Manual Install</a></li></ul></li><li><a class="tocitem" href="lib/autodoc/">API</a></li><li><a class="tocitem" href="developers/">Developers</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Introduction</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Introduction</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/mahiki/PrefectInterfaces.jl/blob/main/docs/src/index.md#" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="PrefectInterfaces.jl"><a class="docs-heading-anchor" href="#PrefectInterfaces.jl">PrefectInterfaces.jl</a><a id="PrefectInterfaces.jl-1"></a><a class="docs-heading-anchor-permalink" href="#PrefectInterfaces.jl" title="Permalink"></a></h1><blockquote><p>May the Prefect Julia SDK arrive soon.</p></blockquote><p>You prefer to analyze and wrangle data in Julia, and you orchestrate your data workflows with Prefect (in python), this project helps you bring those together.</p><p><strong>PrefectInterfaces.jl</strong> helps you integrate Julia operations into a Prefect orchestration environment. Julia functions call your Prefect instance (Server or Cloud) and pull block information including secrets. Now you can use Prefect python flows to call your Julia process via <code>DockerContainer</code> or <code>ShellOperation</code> and deploy these in the normal way. The Julia process has access to resources and can read/write in the same environment as the rest of your orchestration code.</p><p>Included in the package is a bootstrapped installation of a local Prefect instance, and an example <code>Dataset</code> type to demonstrate a concrete use-case.</p><h2 id="Installation"><a class="docs-heading-anchor" href="#Installation">Installation</a><a id="Installation-1"></a><a class="docs-heading-anchor-permalink" href="#Installation" title="Permalink"></a></h2><div class="admonition is-info"><header class="admonition-header">Requires a Prefect Instance</header><div class="admonition-body"><p>To use most functionality, a Prefect server/cloud instance must be available. Provide the API endpoint via environment variable <code>PREFECT_API_URL</code> or set the definition within julia application code.</p><p>See <a href="prefect/install-local-prefect-environment/#Prefect-Installation">Prefect Installation</a> to quickly launch a local Prefect server.</p></div></div><pre><code class="language-julia hljs">julia&gt; Pkg.add(&quot;PrefectInterfaces&quot;)</code></pre><h2 id="Usage"><a class="docs-heading-anchor" href="#Usage">Usage</a><a id="Usage-1"></a><a class="docs-heading-anchor-permalink" href="#Usage" title="Permalink"></a></h2><ul><li>List available Prefect blocks</li><li>Load a secret from the Prefect DB</li><li>Load a local file system block from Prefect DB</li><li>Use the <code>read_path</code>, <code>write_path</code> methods from the FS Block.<ul><li>Notice the block implements a base path</li></ul></li></ul><div class="admonition is-info"><header class="admonition-header">Read/Write Assumes CSV Data</header><div class="admonition-body"><p><code>read_path/write_path</code>, and also the <code>Dataset</code> read/write methods, currently support read/read via <code>CSV</code> module. In the future this should be refactored to handle any type of file.</p></div></div><pre><code class="language-julia hljs"># provide a reference to the running Prefect REST API
+julia&gt; ENV[&quot;PREFECT_API_URL&quot;] = &quot;http://127.0.0.1:4300/api&quot;
+
+using PrefectInterfaces
+
+db = ls();
+db.blocks
+    # 3-element Vector{String}:
+    #  &quot;local-file-system/willowdata&quot;
+    #  &quot;secret/necromancer&quot;
+    #  &quot;string/syrinx&quot;
+
+secret_block = PrefectBlock(&quot;secret/necromancer&quot;)
+# PrefectBlock(&quot;secret/necromancer&quot;, Main.PrefectInterfaces.SecretBlock(&quot;secret/necromancer&quot;, &quot;secret&quot;, ####Secret####))
+
+secret_block.block.value
+    #  ####Secret####
+
+secret_block.block.value.secret
+    # &quot;abcd1234&quot;
+
+using DataFrames
+df = DataFrame(
+    flag = [false, true, false, true, false, true]
+    , amt = [19.00, 11.00, 35.50, 32.50, 5.99, 5.99]
+    , qty = [1, 4, 1, 3, 21, 109]
+    , item = [&quot;B001&quot;, &quot;B001&quot;, &quot;B020&quot;, &quot;B020&quot;, &quot;BX00&quot;, &quot;BX00&quot;]
+    , day = [&quot;2021-01-01&quot;, &quot;2021-01-01&quot;, &quot;2112-12-12&quot;, &quot;2020-10-20&quot;, &quot;2021-05-04&quot;, &quot;1984-07-04&quot;]
+    );
+
+fs_block = PrefectBlock(&quot;local-file-system/willowdata&quot;);
+dump(fs_block)
+    # PrefectBlock
+    #   blockname: String &quot;local-file-system/willowdata&quot;
+    #   block: LocalFSBlock
+    #     blockname: String &quot;local-file-system/willowdata&quot;
+    #     blocktype: String &quot;local-file-system&quot;
+    #     basepath: String &quot;$HOME/willowdata/main&quot;
+    #     read_path: #4 (function of type PrefectInterfaces.var&quot;#4#6&quot;{String})
+    #       basepath: String &quot;$HOME/willowdata/main&quot;
+    #     write_path: #5 (function of type PrefectInterfaces.var&quot;#5#7&quot;{String})
+    #       basepath: String &quot;$HOME/willowdata/main&quot;
+
+datafile = fs_block.block.write_path(&quot;csv/dataset=test_block_write/data.csv&quot;, df)
+    # &quot;$HOME/willowdata/main/csv/dataset=test_block_write/data.csv&quot;
+
+isfile(datafile)
+    # true
+
+df2 = fs_block.block.read_path(&quot;csv/dataset=test_block_write/data.csv&quot;)
+    # 6×5 DataFrame
+    #  Row │ flag   amt      qty    item     day
+    #      │ Bool   Float64  Int64  String7  Date
+    # ─────┼────────────────────────────────────────────
+    #    1 │ false    19.0       1  B001     2021-01-01
+    #    2 │  true    11.0       4  B001     2021-01-01
+    #    3 │ false    35.5       1  B020     2112-12-12
+    #    4 │  true    32.5       3  B020     2020-10-20
+    #    5 │ false     5.99     21  BX00     2021-05-04
+    #    6 │  true     5.99    109  BX00     1984-07-04</code></pre><h2 id="Datasets"><a class="docs-heading-anchor" href="#Datasets">Datasets</a><a id="Datasets-1"></a><a class="docs-heading-anchor-permalink" href="#Datasets" title="Permalink"></a></h2><p>On top of the Prefect API, this package includes a <strong>Datasets</strong> module that reads/writes dataframes to file locations based only on the name you give to the data artifact, see <a href="julia-demo/#Dataset-Type">Dataset Type</a>.</p><h2 id="Calling-From-Prefect-Flow"><a class="docs-heading-anchor" href="#Calling-From-Prefect-Flow">Calling From Prefect Flow</a><a id="Calling-From-Prefect-Flow-1"></a><a class="docs-heading-anchor-permalink" href="#Calling-From-Prefect-Flow" title="Permalink"></a></h2><p>The one thing the Julia process will need from the prefect flow is the PREFECT<em>API</em>URL. This is accessible from your Prefect python application code via settings. The call to Julia code is via <code>ShellOperation</code> or Docker container.</p><pre><code class="language-py hljs"># Python
+from prefect import flow
+from prefect_shell import ShellOperation
+from prefect import settings
+prefect_api = settings.PREFECT_API_URL.value()
+    # &#39;http://127.0.0.1:4300/api&#39;
+
+@flow(log_prints=True)
+call_julia_script(prefect_api_url_arg=prefect_api):
+    result = ShellOperation(
+        stream_output=True
+        , command=[&quot;julia --project=. --load path/to/julia-script.jl&quot;]
+        , working_dir=&quot;path/to/whatever&quot;
+        , env={&quot;PREFECT_API_URL&quot;: prefect_api_url_arg}
+        ).run()</code></pre><p>So you&#39;ll pass this to your <code>Docker</code> or <code>ShellOperation</code> either as an env variable or parameter to the julia command.</p><hr/><p>For more detailed design discussion, including &quot;why not PythonCall/JuliaCall&quot;, see <a href="usage-and-explanation/#Usage-and-Design-Explanation">Usage and Design Explanation</a>.</p></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="julia-demo/">Demonstration »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Saturday 26 August 2023 05:34">Saturday 26 August 2023</span>. Using Julia version 1.9.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
