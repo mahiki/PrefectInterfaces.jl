@@ -40,7 +40,31 @@ poetry run prefect server start
 PREFECT_API_URL="http://127.0.0.1:4300/api" poetry run python src/call_julia_script.py
 ```
 
-The Prefect logs will print to stdout, and also view viewable in the Prefect UI from `http://127.0.0.1:4300/flow-runs`. 
+The Prefect logs will print to stdout, and also view viewable in the Prefect UI from `http://127.0.0.1:4300/flow-runs`.
+
+Logs from Prefect to stdout look like this:
+```bash
+16:30:12.217 | DEBUG   | prefect.profiles - Using profile 'main'
+cwd: /Users/mahiki/repo/julia-pkgs/PrefectInterfaces/prefect
+16:30:12.614 | DEBUG   | prefect.client - Connecting to API at http://127.0.0.1:4300/api/
+16:30:12.639 | INFO    | prefect.engine - Created flow run 'belligerent-markhor' for flow 'call-julia-script'
+16:30:12.639 | INFO    | Flow run 'belligerent-markhor' - View at http://127.0.0.1:4300/flow-runs/flow-run/d8c7db9d-de9e-4d08-b115-dc24ef90685e
+16:30:12.640 | DEBUG   | prefect.task_runner.concurrent - Starting task runner...
+16:30:12.648 | DEBUG   | prefect.client - Connecting to API at http://127.0.0.1:4300/api/
+16:30:12.724 | DEBUG   | Flow run 'belligerent-markhor' - Executing flow 'call-julia-script' for flow run 'belligerent-markhor'...
+16:30:12.724 | DEBUG   | Flow run 'belligerent-markhor' - Beginning execution...
+16:30:12.724 | INFO    | Flow run 'belligerent-markhor' - Calling module from module_path: julia/CallingJulia.jl
+# ...etc...
+16:30:13.164 | INFO    | Flow run 'belligerent-markhor' - ShellOperation returned:
+Hello from the Julia script, prints are logged from prefect flow.
+
+┌ Info: By-Tor left a message
+└   input = "calling from prefect flow."
+┌ Info: You can using PrefectInterfaces commands to retrieve blocks because
+└   prefect_api_url = "http://127.0.0.1:4300/api"
+16:30:13.209 | DEBUG   | prefect.task_runner.concurrent - Shutting down task runner...
+16:30:13.209 | INFO    | Flow run 'belligerent-markhor' - Finished in state Completed()
+```
 
 
 !!! note "Helpful Hints"
