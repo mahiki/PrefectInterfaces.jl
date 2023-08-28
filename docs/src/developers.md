@@ -34,7 +34,9 @@ cd ./prefect
 just launch
 
 cd ./PrefectInterfaces
-julia --project=. --startup-file=no --eval 'import Pkg; Pkg.test()'
+PREFECT_API_URL="http://127.0.0.1:4204/api" julia --debug-info=2 --project=. \
+    --startup-file=no --eval 'import Pkg; Pkg.test()'
+
 # SERVER HEALTH CHECK #
 # =================== #
 Active Prefect Environment: main
