@@ -25,17 +25,14 @@ julia> spec_fsblock = LocalFSBlock("local-file-system/xanadu", "local-file-syste
 
 julia> fsblock = PrefectBlock("local-file-system/xanadu", spec_fsblock);
 
-julia> dump(fsblock)
-PrefectBlock
-  blockname: String "local-file-system/xanadu"
-  block: LocalFSBlock
-    blockname: String "local-file-system/xanadu"
-    blocktype: String "local-file-system"
-    basepath: String "/usr/mahiki/xanadu/dev"
-    read_path: #4 (function of type PrefectInterfaces.var"#4#6"{String})
-      basepath: String "/usr/mahiki/xanadu/dev"
-    write_path: #5 (function of type PrefectInterfaces.var"#5#7"{String})
-      basepath: String "/usr/mahiki/xanadu/dev"
+julia> fsblock.blockname
+"local-file-system/xanadu"
+
+julia> propertynames(fsblock.block)
+(:blockname, :blocktype, :basepath, :read_path, :write_path)
+
+julia> fsblock.block.basepath
+"/usr/mahiki/xanadu/dev"
 ```
 """
 struct PrefectBlock <: AbstractPrefectBlock

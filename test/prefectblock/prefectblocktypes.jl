@@ -16,6 +16,18 @@ password = SecretString("abcd1234")
 @test password.secret == "abcd1234"
 @test repr(password) == "####Secret####"
 
+secretblock = SecretBlock("secret", "necromancer", "abcd1234")
+@test typeof(secretblock) == SecretBlock
+@test repr(secretblock.value) == "####Secret####"
+@test secretblock.value.secret == "abcd1234"
+# make sure dump to stdout doesn't contain secret
+tmp = tempname()
+redirect_stdio(stdout=tmp) do
+    dump(secretblock)
+end
+result = read(tmp, String)
+@test ! contains(result, "abcd1234")
+
 awscredentials = AWSCredentialsBlock("aws-creds/signals", "aws-creds", "us-west-2"
     , "AKIAXXXX1234XXXX1234", "GRU999999BOO")
 @test typeof(awscredentials) == AWSCredentialsBlock

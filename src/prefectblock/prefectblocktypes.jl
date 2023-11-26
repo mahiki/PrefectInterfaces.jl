@@ -30,7 +30,7 @@ struct SecretString
     secret::String
 end
 Base.show(io::IO, s::SecretString) = print(io, "####Secret####")
-Base.dump(io::IO, s::SecretString; maxdepth=1) = print(io, "SecretString")
+Base.dump(io::IOContext, s::SecretString, n::Int64, indent) = print(io, "SecretString")
 
 struct SecretBlock <: AbstractPrefectBlock
     blockname::String
@@ -101,7 +101,6 @@ struct CredentialPairBlock <: AbstractPrefectBlock
         new(blockname, blocktype, id, SecretString(secret_key)
         )
 end
-# TODO: Base.show, Base.dump override
 
 struct S3BucketBlock <: AbstractPrefectBlock
     blockname::String
@@ -117,5 +116,3 @@ struct S3BucketBlock <: AbstractPrefectBlock
         )
     # TODO: read_path/write_path function
 end
-# TODO: Base.show, Base.dump override, dump to show maxdepth 1, not working yet
-Base.dump(io::IO, block::S3BucketBlock) = Base.dump(io::IO, block; maxdepth=1)
