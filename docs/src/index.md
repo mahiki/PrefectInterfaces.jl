@@ -9,7 +9,7 @@ Included in the package is a bootstrapped installation of a local Prefect instan
 
 ## Installation
 !!! note "Requires a Prefect Instance"
-    To use most functionality, a Prefect server/cloud instance must be available. Provide the API endpoint via environment variable `PREFECT_API_URL` or set the definition within julia application code.
+    To use most functionality, a Prefect server/cloud instance must be available. Provide the API endpoint via environment variable `PREFECT_API_URL` or set the definition within julia application code. If authenticating to Prefect Cloud, or if your server instances has an authentication key, you will also need `PREFECT_API_KEY`. See [PrefectAPI](@ref).
 
     See [Prefect Installation](@ref) to quickly launch a local Prefect server.
 
@@ -93,7 +93,7 @@ df2 = fs_block.block.read_path("csv/dataset=test_block_write/data.csv")
 On top of the Prefect API, this package includes a **Datasets** module that reads/writes dataframes to file locations based only on the name you give to the data artifact, see [Dataset Type](@ref).
 
 ## Calling From Prefect Flow
-The one thing the Julia process will need from the prefect flow is the PREFECT_API_URL. This is accessible from your Prefect python application code via settings. The call to Julia code is via `ShellOperation` or Docker container.
+The one thing the Julia process will need from the prefect flow is the `PREFECT_API_URL` (and `PREFECT_API_KEY` if using Prefect Cloud). This is accessible from your Prefect python application code via settings. The call to Julia code is via `ShellOperation` or Docker container.
 
 ```py
 # Python
@@ -113,7 +113,7 @@ call_julia_script(prefect_api_url_arg=prefect_api):
         ).run()
 ```
 
-So you'll pass this to your `Docker` or `ShellOperation` either as an env variable or parameter to the julia command.
+So can pass the Prefect API endpoint to your `Docker` or `ShellOperation` either as an env variable or parameter to the julia command.
 
 
 ----------
