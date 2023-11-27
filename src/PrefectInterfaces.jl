@@ -34,6 +34,7 @@ module PrefectInterfaces
 
 abstract type AbstractPrefectInterface end
 abstract type AbstractPrefectBlock <: AbstractPrefectInterface end
+abstract type AbstractPrefectConfig <: AbstractPrefectInterface end
 
 export  AbstractPrefectInterface,
         AbstractPrefectBlock,
@@ -50,9 +51,9 @@ export  AbstractPrefectInterface,
         getblock,
         makeblock
         
+include("prefectblock/prefectblocktypes.jl")
 include("config.jl")
 include("prefectblock/prefectblock.jl")
-include("prefectblock/prefectblocktypes.jl")
 include("Datasets/Datasets.jl")
 
 using   .Datasets

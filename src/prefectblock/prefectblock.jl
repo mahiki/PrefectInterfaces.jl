@@ -7,11 +7,11 @@ using Parameters, Match
 Constructors:
 
     PrefectBlock(blockname::String)
-    PrefectBlock(blockname::String, api_url::String)
+    PrefectBlock(blockname::String, api::PrefectAPI)
     PrefectBlock(blockname::String, block::AbstractPrefectBlock)
 
 Returns a Prefect Block from the Prefect server, the block data is stored in the `block` field. Prefect Block names are strings called 'slugs', formatted as `block-type-name/block-name`.
-A Prefect Block is uniquely specified by its name and the Prefect DB where it is stored, therefore the API URL is necessary for the constructor.
+A Prefect Block is uniquely specified by its name and the Prefect DB where it is stored, therefore the API URL is necessary for the constructor. The single-argument constructor takes the default PrefectAPI() as the Prefect Server endpoint.
 
 A non-server block can be constructed by supplying an AbstractPrefectBlock object.
 
@@ -40,24 +40,22 @@ struct PrefectBlock <: AbstractPrefectBlock
     block::AbstractPrefectBlock
 end
 PrefectBlock(blockname::String) = begin
-    url = PrefectAPI().url
-    blockdict = getblock(blockname, api_url=url)
+    blockdict = getblock(blockname)
     newblock = makeblock(blockdict)
     @assert blockname == newblock.blockname
     PrefectBlock(blockname, newblock)
 end
-PrefectBlock(blockname::String, api_url::String) = begin
-    url = PrefectAPI(api_url).url
-    block_dict = getblock(blockname, api_url=url)
+PrefectBlock(blockname::String, api::PrefectAPI) = begin
+    block_dict = getblock(blockname, api = api)
     newblock = makeblock(block_dict)
     @assert blockname == newblock.blockname
     PrefectBlock(blockname, newblock)
 end
 
 """
-    ls(; type="block", api_url::String=PrefectAPI().url)
+    ls(; type="block", api::PrefectAPI = PrefectAPI())
 
-Calls the Prefect server and returns a list of all defined blocks as Vector{String}. Default is to list all blocks, later implementation could include "flows", "deployments", "work-pool" etc.
+Calls the Prefect server and returns a list of all defined blocks as Vector{String}. Default is to list all blocks, later implementation could include "flows", "deployments", "work-pool" etc. See `PrefectAPI` docs for details about authentication if needed.
 
 # Examples:
 ```julia
@@ -78,7 +76,7 @@ julia> ls()
  "string/environment"
 ```
 """
-function ls(; type="block", api_url::String=PrefectAPI().url)
+function ls(; type="block", api::PrefectAPI = PrefectAPI())
     # TODO: this could be better, have a show definition and return PrefectBlockList, as a dict of julia block type or block id.
     # TODO: deployments, flows, flow-run, etc.
     if type ∉ ["block"]
@@ -86,16 +84,17 @@ function ls(; type="block", api_url::String=PrefectAPI().url)
         return nothing
     end
     response = try
-        HTTP.request(
-            "POST"
-            , "$(api_url)/block_documents/filter"
+        HTTP.post(
+            "$(api.url)/block_documents/filter"
+            , ["Authorization" => "Bearer $(api.key.secret)"]
+            ; copyheaders = false
             , connect_timeout = 3
             , readtimeout = 5
             , retries = 1
             )
     catch ex
         if typeof(ex) ∈ [HTTP.Exceptions.StatusError, HTTP.ConnectError]
-            @warn "no connection." api_url
+            @warn "no connection." api.url
             println("$ex")
             return nothing
         else
@@ -112,17 +111,18 @@ function ls(; type="block", api_url::String=PrefectAPI().url)
 end
 
 """
-    getblock(blockname::String; api_url::String=PrefectAPI().url)
+    getblock(blockname::String; api::AbstractPrefectConfig = PrefectAPI())
 
-Makes an `HTTP.get()` call to provided URL endpoint, default endpoint constructed by `PrefectAPI().url`. Returns a Dict containing the Prefect Block specification.
+Makes an `HTTP.get()` call to provided URL endpoint, default endpoint constructed by `PrefectAPI`. Returns a Dict containing the Prefect Block specification.
 """
-function getblock(blockname::String; api_url::String=PrefectAPI().url)
+function getblock(blockname::String; api::PrefectAPI = PrefectAPI())
     block = blockname_components(blockname)
     try
-        response = HTTP.request(
-            "GET"
-            , "$(api_url)/block_types/slug/$(block.slug)/block_documents/name/$(block.name)"
-            ; query = ["include_secrets" => "true"]
+        response = HTTP.get(
+            "$(api.url)/block_types/slug/$(block.slug)/block_documents/name/$(block.name)"
+            , ["Authorization" => "Bearer $(api.key.secret)"]
+            ; copyheaders = false
+            , query = ["include_secrets" => "true"]
             , connect_timeout = 3
             , readtimeout = 5
             , retries = 1
