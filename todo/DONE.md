@@ -37,3 +37,34 @@ x = settings.PREFECT_API_URL.value()
 'http://127.0.0.1:4300/api'
 ```
 So it works. The julia application needs to receive this value as a parameter.
+
+## DONE: SECRETBLOCK OBFUSCATE DUMP
+Issue #9
+
+DONE: override dump to obscure SecretBlock from logs
+```jl
+sblk = SecretBlock("poo", "patype", "abc123")
+SecretBlock("poo", "patype", ####Secret####)
+
+show(sblk)
+SecretBlock("poo", "patype", ####Secret####)
+dump(sblk)
+SecretBlock
+  blockname: String "poo"
+  blocktype: String "patype"
+  value: SecretString
+    secret: String "abc123"
+
+Base.dump(io::IOContext, s::SecretString, n::Int64, indent) = print(io, "SecretString")
+dump(sblk)
+# SecretBlock
+#   blockname: String "poo"
+#   blocktype: String "patype"
+#   value: SecretString
+dump(sblk, maxdepth = 4)
+# SecretBlock
+#   blockname: String "poo"
+#   blocktype: String "patype"
+#   value: SecretString
+```
+DONE
