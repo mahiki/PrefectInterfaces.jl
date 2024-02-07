@@ -9,7 +9,7 @@ Included in the package is a bootstrapped installation of a local Prefect instan
 
 ## Installation
 !!! note "Requires a Prefect Instance"
-    To use most functionality, a Prefect server/cloud instance must be available. Provide the API endpoint via environment variable `PREFECT_API_URL` or set the definition within julia application code. If authenticating to Prefect Cloud, or if your server instances has an authentication key, you will also need `PREFECT_API_KEY`. See [PrefectAPI](@ref).
+    To use most functionality, a Prefect server/cloud instance must be available. Provide the API endpoint via environment variable `PREFECT_API_URL` or set the definition within julia application code. If authenticating to Prefect Cloud, or if your server instances has an authentication key, you will also need `PREFECT_API_KEY`. See [`PrefectAPI`](@ref).
 
     See [Prefect Installation](@ref) to quickly launch a local Prefect server.
 
