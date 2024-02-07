@@ -14,7 +14,7 @@ strblock = PrefectBlock(strname)
 @test fieldnames(typeof(strblock.block)) == (:blockname, :blocktype, :value)
 @test strblock.blockname == strblock.block.blockname
 @test strblock.block.blocktype == "string"
-@test strblock.block.value == "main"
+@test strblock.block.value ∈ ["main", "dev"]
 
 # test specified api url
 strblock2 = PrefectBlock(strname, ACTIVE_API)
@@ -27,7 +27,7 @@ fsblock = PrefectBlock(fsname)
 @test fieldnames(typeof(fsblock.block)) == (:blockname, :blocktype, :basepath, :read_path, :write_path)
 @test fsblock.blockname == fsblock.block.blockname
 @test fsblock.block.blocktype == "local-file-system"
-@test fsblock.block.basepath == "$(homedir())/willowdata/main"
+@test fsblock.block.basepath == "$(homedir())/willowdata/$(strblock.block.value)"
 
 # getblock function
 @test typeof(getblock(strname)) <: AbstractDict

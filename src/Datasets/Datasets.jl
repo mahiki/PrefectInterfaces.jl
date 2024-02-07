@@ -62,10 +62,7 @@ julia> df = read(ds)
 """
 @with_kw struct Dataset <: AbstractPrefectInterface
     dataset_name::String
-    datastore_type::String = begin
-        @warn "datastore_type = remote not supported yet"
-        "local"
-    end
+    datastore_type::String = "local"
     dataset_type::String = "extracts"
     file_format::String = "csv"
     rundate::Date = Dates.today()
@@ -109,7 +106,6 @@ function read(
     ds::Dataset
     ; block::AbstractPrefectBlock = block_selector(ds)
     )
-    @warn "remote datastore read/write not supported yet"
     prefect_block = block
     path_key = rundate_path_selector(ds).read
     prefect_block.block.read_path(path_key)
@@ -125,7 +121,6 @@ function write(
     , df::AbstractDataFrame
     ; block::AbstractPrefectBlock = block_selector(ds)
     )
-    @warn "remote datastore read/write not supported yet"
     prefect_block = block
     path_key = rundate_path_selector(ds).write
     [prefect_block.block.write_path(x, df) for x in path_key]

@@ -48,7 +48,7 @@ creds = CredentialPairBlock("credentialpair/strangiato", "credentialpair", "user
 s3bucket = S3BucketBlock("s3-bucket/willowdata", "s3-bucket", "cygnus-x1", "willowdata/dev"
     , "us-west-2", "AKIAXXXX1234XXXX1234", "GRU999999BOO")
 @test typeof(s3bucket) == S3BucketBlock
-@test fieldnames(S3BucketBlock) == (:blockname, :blocktype, :bucket_name, :bucket_folder, :region_name, :aws_access_key_id, :aws_secret_access_key)
+@test fieldnames(S3BucketBlock) == (:blockname, :blocktype, :bucket_name, :bucket_folder, :region_name, :aws_access_key_id, :aws_secret_access_key, :read_path, :write_path)
 @test s3bucket.blockname == "s3-bucket/willowdata"
 @test s3bucket.blocktype == "s3-bucket"
 @test s3bucket.bucket_name == "cygnus-x1"
