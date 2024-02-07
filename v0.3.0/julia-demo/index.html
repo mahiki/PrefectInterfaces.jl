@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Julia REPL · PrefectInterfaces.jl</title><script data-outdated-warner src="../assets/warner.js"></script><link rel="canonical" href="https://mahiki.github.io/PrefectInterfaces.jl/julia-demo/"/><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.045/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.24/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">PrefectInterfaces.jl</a></span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Introduction</a></li><li><span class="tocitem">Demonstration</span><ul><li class="is-active"><a class="tocitem" href>Julia REPL</a><ul class="internal"><li><a class="tocitem" href="#Examples"><span>Examples</span></a></li><li><a class="tocitem" href="#Dataset-Type"><span>Dataset Type</span></a></li><li><a class="tocitem" href="#Environment"><span>Environment</span></a></li></ul></li><li><a class="tocitem" href="../call-julia-from-prefect-flow/">Prefect Python</a></li></ul></li><li><a class="tocitem" href="../usage-and-explanation/">Detailed Explanation</a></li><li><span class="tocitem">Prefect</span><ul><li><a class="tocitem" href="../prefect/install-local-prefect-environment/">Prefect Install</a></li><li><a class="tocitem" href="../prefect/setup-without-justfile/">Manual Install</a></li></ul></li><li><a class="tocitem" href="../lib/autodoc/">API</a></li><li><a class="tocitem" href="../developers/">Developers</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Demonstration</a></li><li class="is-active"><a href>Julia REPL</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Julia REPL</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/mahiki/PrefectInterfaces.jl/blob/main/docs/src/julia-demo.md#" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Julia-Demo-on-REPL"><a class="docs-heading-anchor" href="#Julia-Demo-on-REPL">Julia Demo on REPL</a><a id="Julia-Demo-on-REPL-1"></a><a class="docs-heading-anchor-permalink" href="#Julia-Demo-on-REPL" title="Permalink"></a></h1><p>This demonstrates interacting with a running Prefect DB from the Julia REPL. If you don&#39;t have a Prefect Server instance running, see the <a href="../prefect/install-local-prefect-environment/#Prefect-Installation">Prefect Installation</a> doc first. Block information is usually pulled from the Prefect DB, but Prefect Block types can also be manually created from the constructors.</p><p>See files in the <code>test</code> folder for examples of Block usage and loading data from Prefect DB, some require the Prefect DB to run and some tests simply construct dummy objects without connecting to Prefect.</p><p>Entering the Julia REPL from the <code>just julia</code> command will inject the <code>.env</code> variables. Execute the <code>just</code> commands from the appropriate directory as shown.</p><pre><code class="language-sh hljs">$ cd ./prefect/
+$ just launch
+
+    # to verify server is running, and the API PORT:
+    just view main
+    # CTRL-b, d to exit
+
+$ cd ../julia-demo
+
+# start julia in current project, env vars will be loaded as well
+$ just julia</code></pre><h2 id="Examples"><a class="docs-heading-anchor" href="#Examples">Examples</a><a id="Examples-1"></a><a class="docs-heading-anchor-permalink" href="#Examples" title="Permalink"></a></h2><ul><li>Call the <code>PrefectAPI</code> function</li><li>Access the secret string in an AWS Credentials block via <code>.secret</code> field</li></ul><pre><code class="language-julia hljs">julia&gt; using PrefectInterfaces
+
+# returns the current endpoint from env
+PrefectAPI().url
+    # &quot;http://127.0.0.1:4300/api&quot;
+
+# PrefectAPI is called by various functions to retreive the current API env value
+ENV[&quot;PREFECT_API_URL&quot;] = &quot;http://127.0.0.1:4301/api&quot;;
+PrefectAPI().url
+    # &quot;http://127.0.0.1:4301/api&quot;
+
+# Construct an example, normally this is pulled from DB if such a block 
+#   exists with PrefectBlock(&quot;aws-credentials/subdivisions&quot;)
+creds = AWSCredentialsBlock(
+    &quot;aws-credentials/subdivisions&quot;
+    , &quot;aws-credentials&quot;
+    , &quot;us-west-2&quot;
+    , &quot;AKIAXXX999XXX999&quot;
+    , &quot;GUUxx87987xxPXH&quot;)
+    # AWSCredentialsBlock(&quot;aws-credentials/subdivisions&quot;, &quot;aws-credentials&quot;, &quot;us-west-2&quot;, &quot;AKIAXXX999XXX999&quot;, ####Secret####)
+
+creds.aws_secret_access_key
+    # ####Secret####
+
+creds.aws_secret_access_key.secret
+    # &quot;GUUxx87987xxPXH&quot;</code></pre><p>The secret is obfuscated, to prevent it being visible in logs. </p><p>There are other <code>AbstractPrefectBlock</code> types, see list below. These facilitate interactions with Blocks in your Prefect instance, they are primary organizing abstractions in the Prefect world.</p><pre><code class="language-julia hljs">julia&gt; names(PrefectInterfaces);
+subtypes(PrefectInterfaces.AbstractPrefectBlock)
+    #    AWSCredentialsBlock
+    #    CredentialPairBlock
+    #    LocalFSBlock
+    #    PrefectBlock
+    #    S3BucketBlock
+    #    StringBlock
+    #    SecretBlock</code></pre><p>Shut down the server after exiting julia.</p><pre><code class="language-sh hljs">$ cd ../prefect
+$ just kill</code></pre><h2 id="Dataset-Type"><a class="docs-heading-anchor" href="#Dataset-Type">Dataset Type</a><a id="Dataset-Type-1"></a><a class="docs-heading-anchor-permalink" href="#Dataset-Type" title="Permalink"></a></h2><p>This type is an opinionated means of organizing data artifacts by name.  This is not a part of the Prefect API, and can be disregarded. Dataset is not a dependency of the Prefect types that are meant to constitute an unofficial &#39;Prefect Julia SDK&#39;.</p><p>This is a lightweight organizational construct for reading/writing data artifacts as a part of orchestrated data pipelines. The type merely holds metadata about named data sets and where they should be found or placed in a file system that is defined by a Prefect Block. The data files get arranged in a hive-ish file structure that allows tracking experiment results or daily extracts. The layout assumes partitions of daily data, additing additional partitions to the struct definition wouldn&#39;t be difficult.</p><p>The fields of the Dataset type are populated by env variables (loaded from a <code>.env</code> file) or defined in the constructor. The env variables <code>PREFECT_DATA_BLOCK_REMOTE</code>, <code>PREFECT_DATA_BLOCK_LOCAL</code> are used by the <code>PrefectDatastoreNames()</code> to return the names of your Prefect blocks which define remote or local storage.</p><pre><code class="language-julia hljs">ENV[&quot;PREFECT_API_URL&quot;] = &quot;http://127.0.0.1:4300/api&quot;
+ENV[&quot;PREFECT_DATA_BLOCK_LOCAL&quot;] = &quot;local-file-system/willowdata&quot;
+ENV[&quot;PREFECT_DATA_BLOCK_REMOTE&quot;] = &quot;local-file-system/willowdata&quot;   
+     # NOTE: defining the same, unless you have a remote storage block registered
+
+ds = Dataset(dataset_name=&quot;limelight_moving_pictures&quot;, datastore_type=&quot;local&quot;)
+
+using DataFrames
+df = DataFrame(
+    flag = [false, true, false, true, false, true]
+    , amt = [19.00, 11.00, 35.50, 32.50, 5.99, 5.99]
+    , qty = [1, 4, 1, 3, 21, 109]
+    , item = [&quot;B001&quot;, &quot;B001&quot;, &quot;B020&quot;, &quot;B020&quot;, &quot;BX00&quot;, &quot;BX00&quot;]
+    , day = [&quot;2021-01-01&quot;, &quot;2021-01-01&quot;, &quot;2112-12-12&quot;, &quot;2020-10-20&quot;, &quot;2021-05-04&quot;, &quot;1984-07-04&quot;]
+    );
+
+write(ds, df)
+    #  &quot;$HOME/willowdata/main/extracts/csv/latest/dataset=limelight_moving_pictures/data.csv&quot;
+    #  &quot;$HOME/willowdata/main/extracts/csv/dataset=limelight_moving_pictures/rundate=2023-08-14/data.csv&quot;
+
+dfr = read(ds)
+    # 6×5 DataFrame
+    #  Row │ flag   amt      qty    item     day
+    #  ... etc</code></pre><p>The <code>read</code> and <code>write</code> functions are calling the Prefect Server API to retrieve block information, in this case the <code>LocalFilesystem.basepath</code> attribute.</p><p>Notice the <code>write</code> function writes to two locations unless <code>rundate_type=&quot;specific&quot;</code>. This is for the use-case of running a backfill of historical daily data without affecting the &#39;latest&#39; path. The &#39;latest&#39; folder is a convenience rather than creating a module that reads file metdata.</p><pre><code class="nohighlight hljs">tree $HOME/willowdata/main/extracts
+$HOME/willowdata/main/extracts
+└── csv
+    ├── dataset=limelight_moving_pictures
+    │   └── rundate=2023-08-14
+    │       └── data.csv
+    └── latest
+        └── dataset=limelight_moving_pictures
+            └── data.csv</code></pre><p>Reading/writing a specific rundate:</p><pre><code class="language-julia hljs"># writing a specific rundate
+ds1 = Dataset(dataset_name=&quot;test_dataset_specific&quot;, datastore_type=&quot;local&quot;, rundate=Date(&quot;2112-03-15&quot;))
+    # Dataset
+    #   dataset_name: String &quot;test_dataset_specific&quot;
+    #   datastore_type: String &quot;local&quot;
+    #   dataset_type: String &quot;extracts&quot;
+    #   file_format: String &quot;csv&quot;
+    #   rundate: Date
+    #   rundate_type: String &quot;specific&quot;
+    #   dataset_path: String &quot;extracts/csv/dataset=test_dataset_specific/rundate=2112-03-15/data.csv&quot;
+    #   latest_path: String &quot;extracts/csv/latest/dataset=test_dataset_specific/data.csv&quot;
+    #   image_path: String &quot;extracts/dataset=test_dataset_specific/rundate=2112-03-15&quot;
+
+write(ds1, df)
+    #  &quot;$HOME/willowdata/main/extracts/csv/dataset=test_dataset_specific/rundate=2112-03-15/data.csv&quot;
+
+# note only one path was written. the &#39;latest_path&#39; was not.
+shell&gt; ls -la &quot;$HOME/willowdata/main/$(ds1.latest_path)&quot;
+    # ls: cannot access &#39;$HOME/willowdata/main/extracts/csv/latest/dataset=test_dataset_specific/data.csv&#39;: No such file or directory
+
+shell&gt;  ls -la &quot;$HOME/willowdata/main/$(ds1.dataset_path)&quot;
+    # -rw-r--r-- 1 segovia staff 196 Aug 14 15:45 &#39;$HOME/willowdata/main/extracts/csv/dataset=test_dataset_specific/rundate=2112-03-15/data.csv&#39;
+
+# the &#39;read&#39; function knows to read the correct path
+df1 = read(ds1);
+
+df1 == dfr
+    # true</code></pre><p>The datastore now looks like this:</p><pre><code class="nohighlight hljs">/Users/segovia/willowdata/main/extracts/
+└── csv
+    ├── dataset=test_dataset_specific
+    │   └── rundate=2112-03-15
+    │       └── data.csv
+    ├── dataset=limelight_moving_pictures
+    │   └── rundate=2023-08-14
+    │       └── data.csv
+    └── latest
+        └── dataset=limelight_moving_pictures
+            └── data.csv</code></pre><hr/><h2 id="Environment"><a class="docs-heading-anchor" href="#Environment">Environment</a><a id="Environment-1"></a><a class="docs-heading-anchor-permalink" href="#Environment" title="Permalink"></a></h2><div class="admonition is-info"><header class="admonition-header">A Note about ENV</header><div class="admonition-body"><p>The Prefect types pull information from a running Prefect DB, by calling the REST API stored in PREFECT<em>API</em>URL. If the julia REPL session is called from a <code>just</code> command, the .env variables will be exported into the environment. In application code you need to either set <code>ENV[&quot;PREFECT_API_URL&quot;]=&quot;http://127.0.0.1:4300/api&quot;</code> (for example) or use the <code>ConfigEnv</code> package as shown below to load the <code>.env</code> file from the Julia application.</p></div></div><p>The <code>Dataset</code> read/write functions depend on the local and remote data block names being defined in environment variables.</p><pre><code class="language-julia hljs"># .env file imported with ConfigEnv.dotent(), or just assignment:
+using ConfigEnv
+dotenv(&quot;.env&quot;, overwrite=false)
+
+# all the Prefect env variables are now loaded into the Julia environment
+ENV[&quot;PREFECT_DATA_BLOCK_REMOTE&quot;]
+    # &quot;s3-bucket/willowdata&quot;
+
+# or just set them manually
+begin
+    ENV[&quot;PREFECT_API_URL&quot;] = &quot;http://127.0.0.1:4300/api&quot;
+    ENV[&quot;PREFECT_DATA_BLOCK_LOCAL&quot;] = &quot;local-file-system/willowdata&quot;
+    ENV[&quot;PREFECT_DATA_BLOCK_REMOTE&quot;] = &quot;s3-bucket/willowdata&quot;
+end</code></pre><p>For interactive work, entering the Julia REPL from the <code>just julia</code> command will inject the <code>.env</code> variables.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Introduction</a><a class="docs-footer-nextpage" href="../call-julia-from-prefect-flow/">Prefect Python »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Wednesday 7 February 2024 23:30">Wednesday 7 February 2024</span>. Using Julia version 1.10.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
