@@ -1,5 +1,7 @@
-using CSV, DataFrames
-
+using CSV
+using DataFrames
+using AWS
+using AWSS3
 struct StringBlock <: AbstractPrefectBlock
     blockname::String
     blocktype::String
@@ -92,7 +94,6 @@ struct LocalFSBlock <: AbstractPrefectBlock
     basepath::String
     read_path::Function
     write_path::Function
-    # TODO: should be to filesystem write, CSV write function composable if data is csv
     LocalFSBlock(blockname, blocktype, basepath) =
         new(blockname, blocktype, basepath
             , x -> CSV.read("$basepath/$x", DataFrame)
@@ -134,9 +135,23 @@ struct S3BucketBlock <: AbstractPrefectBlock
     region_name::String
     aws_access_key_id::String
     aws_secret_access_key::SecretString
+    read_path::Function
+    write_path::Function
     S3BucketBlock(
-        blockname, blocktype, bucket_name, bucket_folder, region_name, aws_access_key_id, aws_secret_access_key) =
-        new(blockname, blocktype, bucket_name, bucket_folder, region_name, aws_access_key_id, SecretString(aws_secret_access_key)
-        )
-    # TODO: read_path/write_path function
+        blockname, blocktype, bucket_name, bucket_folder
+        , region_name, aws_access_key_id, aws_secret_access_key
+        ) = begin
+            awsconfig = AWSConfig(
+                AWSCredentials(aws_access_key_id, aws_secret_access_key)
+                , region_name
+                , "text")
+
+            object_path(key) = S3Path(joinpath("s3://", bucket_name, bucket_folder, key); config = awsconfig)
+
+            new(blockname, blocktype, bucket_name, bucket_folder, region_name, aws_access_key_id
+                , SecretString(aws_secret_access_key)
+                , x -> CSV.read(object_path(x), DataFrame)
+                , (x, df) -> CSV.write(object_path(x), df)
+            )
+        end
 end

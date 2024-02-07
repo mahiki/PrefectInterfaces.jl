@@ -9,7 +9,8 @@ const PROJECT_ROOT = pkgdir(PrefectInterfaces)
 const PREFECT_PROFILES = TOML.tryparsefile("$PROJECT_ROOT/prefect/profiles.toml")
 const ACTIVE_API = begin
     active = PREFECT_PROFILES["active"]
-    PREFECT_PROFILES["profiles"][active]["PREFECT_API_URL"]
+    api_url = PREFECT_PROFILES["profiles"][active]["PREFECT_API_URL"]
+    PrefectAPI(api_url)
 end
 
 dotenv("$PROJECT_ROOT/.env"; overwrite=false);

@@ -9,7 +9,7 @@ If `PREFECT_API_KEY` does not exist then an empty string is assigned to `key`. F
 ```jldoctest
 julia> using PrefectInterfaces
 
-julia> ENV["PREFECT_API_URL"] = "http://127.0.0.1:4300/api";
+julia> ENV["PREFECT_API_URL"] = "http://127.0.0.1:4300/api"; ENV["PREFECT_API_KEY"] = "zyxw4321";
 
 julia> api = PrefectAPI()
 PrefectAPI("http://127.0.0.1:4300/api", ####Secret####)
@@ -18,7 +18,7 @@ julia> api.url
 "http://127.0.0.1:4300/api"
 
 julia> api.key.secret
-""
+"zyxw4321"
 
 julia> api.url = "https://api.prefect.cloud/api/accounts/0eEXAMPLE";
 
