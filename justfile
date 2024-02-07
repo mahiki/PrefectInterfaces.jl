@@ -21,7 +21,8 @@ info:
   @echo "  just build - this runs the server, tests, doctest, builds docs"
   @echo "  * now debug until its clean *"
   @echo "  git commit 'closes #3: s3 read/write'"
-  @echo "  ... git merge ... git push"
+  @echo "  ... git merge"
+  @echo "  vim Project.toml -> bump version number, commit."
 
 # pass thru command
 run *args:
