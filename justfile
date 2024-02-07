@@ -10,15 +10,18 @@ default:
 
 # info for developing/testing this package
 info:
-  @echo "Optional to intall poetry package and get prefect local server running: cd prefect/; just init"
+  @echo "Optional on setup:"
+  @echo "  cd prefect/; just init"
+  @echo "  * this intalls poetry package and get prefect local server running"
   @echo
   @echo "Typical dev workflow:"
   @echo "  git checkout -b issue-3/s3-read-write"
   @echo "  just repl; ] instantiate; add PKGS # as neeeded"
-  @echo "  * write/edit tests *"
-  @echo "  just build - this runs the server"
+  @echo "  * code, write/edit tests *"
+  @echo "  just build - this runs the server, tests, doctest, builds docs"
   @echo "  * now debug until its clean *"
-  @echo "  git commit... git merge ... git push"
+  @echo "  git commit 'closes #3: s3 read/write'"
+  @echo "  ... git merge ... git push"
 
 # pass thru command
 run *args:
