@@ -1,5 +1,5 @@
 # Usage and Design Explanation
->A Data Scientist or Analyst User Story
+>A data scientist or analyst with orchestrated jobs and productionized reports.
 
 The problem is to manage routine data ETL or pipeline processing with Prefect and the Python API, while calling Julia fuctions for expressive dataframe transformations or niche high performance custom code. Prefect doesn't provide a Julia SDK (yet), so this package provides components for julia operations that are called from a Prefect orchestration environment. 
 
@@ -53,5 +53,5 @@ The julia environment does not need to be aware of project environment, because 
 
 **Managing dev/prod environment with dev/main git branches:** When both main/dev are local, there will be two local prefect DB with different PREFECT_API_URL defined by the Prefect `profiles.toml` profile. The python side of the application will need to distinguish the dev/prod PREFECT_HOME environment variables to define different locations for the prefect DB (which is just a sqlite file). I prefer to do this in a task runner outside of the python application, something like Github Actions, Make, or `just`.
 
-## Justfile
-I've found when managing a Prefect orchestrator it is helpful to have a taskrunner program that documents development tasks and executes them for you as well. I use [`just`](https://just.systems/) to launch `dev/main` Prefect DB local servers and manage tasks like Prefect deployment builds ßand running tests before merging and deploying. If you, like most data scientists, like to develop and test on the main branch please ignore this part of the package.
+## Why Just Taskrunner
+I've found when managing a Prefect orchestrator it's best to have a taskrunner program to codify and smooth out repetitive tasks. I use [`just`](https://just.systems/) to launch `dev/main` Prefect DB local servers and manage tasks like Prefect deployment builds and running tests before merging and deploying. The justfile provides self-documentation as the workflow evolves.

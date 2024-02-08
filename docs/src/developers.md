@@ -1,5 +1,6 @@
 # Developers
-* Develop and test with/without `just` taskrunner.
+* (Optional) `just` taskrunner, see [Justfile](@ref), install as a dev tool as a convenience.
+* From repo root type '`just info`' for hints.
 * Documenter.jl `doctest()` included in `runtests.jl`
 
 ## Test, Build Docs with Justfile

@@ -10,19 +10,11 @@ default:
 
 # info for developing/testing this package
 info:
-  @echo "Optional on setup:"
+  @echo "Setting up Prefect Demo [Optional]:"
   @echo "  cd prefect/; just init"
-  @echo "  * this intalls poetry package and get prefect local server running"
+  @echo "    * this intalls poetry package and gets prefect local server running"
+  @echo "    * see docs 'Prefect Installation' section"
   @echo
-  @echo "Typical dev workflow:"
-  @echo "  git checkout -b issue-3/s3-read-write"
-  @echo "  just repl; ] instantiate; add PKGS # as neeeded"
-  @echo "  * code, write/edit tests *"
-  @echo "  just build - this runs the server, tests, doctest, builds docs"
-  @echo "  * now debug until its clean *"
-  @echo "  git commit 'closes #3: s3 read/write'"
-  @echo "  ... git merge"
-  @echo "  vim Project.toml -> bump version number, commit."
 
 # pass thru command
 run *args:
@@ -52,3 +44,25 @@ kill:
 
 # full cycle of launch server, test, docs, kill server
 build: launch test docs kill
+
+# dev workflow steps, a reminder
+workflow:
+  @echo "Dev workflow:"
+  @echo "  git checkout -b issue-3/s3-read-write"
+  @echo "  just repl; ] instantiate; add PKGS # as neeeded"
+  @echo "  code, write/edit tests"
+  @echo "  'just build' - this runs the server, tests, doctest, builds docs"
+  @echo "  debug"
+  @echo "  vim Project.toml -> bump version number"
+  @echo "  git commit 'closes #3: s3 read/write'"
+  @echo "    => pull request"
+  @echo "    => git merge; git push"
+  @echo
+  @echo "  Registrator & Tagbot on merge commit"
+  @echo "    add comment to commit to get release as follows:"
+  @echo "    @JuliaRegistrator register"
+  @echo
+  @echo "    Release Notes:"
+  @echo
+  @echo "    # Markdown Notes Here"
+  @echo "    - blah blah"

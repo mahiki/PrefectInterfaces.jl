@@ -85,7 +85,8 @@ end
     read(ds::Dataset)
 
 Returns a `DataFrame` by calling `CSV.read` on a filepath defined by the Dataset type.
-*NOTE:* A prefect server must be available.
+
+*NOTE:* A prefect server must be available to use Dataset read function.
 
 # Examples
 ```julia
@@ -115,6 +116,8 @@ end
     write(ds::Dataset, df::DataFrame)
 
 Writes a `DataFrame` via `CSV.write` to a filepath defined by the `Dataset` type.
+
+*NOTE:* A prefect server must be available to use Dataset read function.
 """
 function write(
     ds::Dataset

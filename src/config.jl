@@ -1,5 +1,7 @@
 """
     PrefectAPI(url::String, key::SecretString) <:AbstractPrefectInterface
+    PrefectAPI(url::String)
+    PrefectAPI()
 
 Mutable struct tha stores the Prefect server api endpoint. All `PrefectInterface` operations depend on connecting to a running Prefect server to pull block information. Constructor with no arguments assigns env variables `PREFECT_API_URL`, `PREFECT_API_KEY`
     
