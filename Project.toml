@@ -1,7 +1,7 @@
 name = "PrefectInterfaces"
 uuid = "25d49962-0f22-42a0-bb44-b427e1ded1d4"
 authors = ["mahiki <mahiki@users.noreply.github.com>"]
-version = "0.3.1"
+version = "0.3.2"
 
 [deps]
 AWS = "fbe9abb3-538b-5e4e-ba9e-bc94f4f92ebc"

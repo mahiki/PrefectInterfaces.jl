@@ -62,7 +62,7 @@ julia> df = read(ds)
 """
 @with_kw struct Dataset <: AbstractPrefectInterface
     dataset_name::String
-    datastore_type::String = "local"
+    datastore_type::String = PrefectDatastoreNames().default
     dataset_type::String = "extracts"
     file_format::String = "csv"
     rundate::Date = Dates.today()

@@ -18,11 +18,13 @@ api = PrefectAPI("https://api.prefect.cloud/api/accounts/0eEXAMPLE", "abcd1234")
 
 # Datasets
 dst = Datasets.PrefectDatastoreNames()
-@test propertynames(dst) == (:remote, :local)
+@test propertynames(dst) == (:remote, :local, :default)
 @test dst.remote == "s3-bucket/willowdata"
 @test dst.local == "local-file-system/willowdata"
+@test dst.default == "local"
 @test typeof(dst) == Datasets.PrefectDatastoreNames
 
 ndst = Datasets.PrefectDatastoreNames("s3/barchetta", "lfs/spirit-of-radio")
 @test ndst.remote == "s3/barchetta"
 @test ndst.local == "lfs/spirit-of-radio"
+@test ndst.default == "local"

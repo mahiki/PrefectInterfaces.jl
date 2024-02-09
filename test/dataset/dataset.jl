@@ -30,6 +30,8 @@ d2 = Dataset(dataset_name="test_dataset_2", rundate_type="latest", rundate=Date(
 d3 = Dataset(dataset_name="test_dataset_3", rundate_type="specific", rundate=Dates.today())
 d4 = Dataset(dataset_name="test_dataset_4", rundate_type="specific", rundate=Date("2020-11-03"))
 
+@test d1.datastore_type == "local"
+
 @test Datasets.rundate_path_selector(d1) == (read = "extracts/csv/latest/dataset=test_dataset_1/data.csv", write = ["extracts/csv/latest/dataset=test_dataset_1/data.csv", "extracts/csv/dataset=test_dataset_1/rundate=$(Dates.today())/data.csv"])
 
 @test Datasets.rundate_path_selector(d2) == (read = "extracts/csv/latest/dataset=test_dataset_2/data.csv", write = ["extracts/csv/latest/dataset=test_dataset_2/data.csv"])
